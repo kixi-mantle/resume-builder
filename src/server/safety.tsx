@@ -1,3 +1,5 @@
+"use server"
+
 import bcrypt from "bcrypt"
 import { randomBytes } from "crypto";
 

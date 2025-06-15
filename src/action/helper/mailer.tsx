@@ -1,6 +1,7 @@
+"use server"
+
 import nodemailer from 'nodemailer'
 import env from '../../server/data'
-import { Types } from 'mongoose'
 
 
 const transporter = nodemailer.createTransport({

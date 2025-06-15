@@ -1,11 +1,15 @@
+"use server"
+
 import { Types } from "mongoose"
-import User from "../models/User"
 import { getVerificationToken } from "../server/safety"
 import { sendVerificationEmail } from "./helper/mailer"
 import { redirect } from "next/navigation"
+import { connectDB } from "../lib/mongodb"
+import User from "../models/User"
 
 
 export const signUp = async (data : {name : string , email : string , password : string}) =>{
+    await connectDB()
     const newUser = await User.create(data)
 
     if(!newUser) return { error : true , msg : "Unexpected Error happen"}
@@ -17,14 +21,16 @@ export const signUp = async (data : {name : string , email : string , password :
         await newUser.save()
 
         await sendVerificationEmail(newUser.email! , await getVerificationToken() , newUser._id.toString())
+        return {error : false , msg : "verification"}
     } catch (error) {
         console.error(error)
+        return {error : true , msg : "verification"}
     }
 
 
 }
 
-export const verifyEmail = async(token : string , id : string) =>{
+export const verifyEmail = async({token , id}:{token : string , id : string}) =>{
 
     const user = await User.findById(new Types.ObjectId(id));
     if(!user) redirect('/')
