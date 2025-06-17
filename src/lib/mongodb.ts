@@ -11,14 +11,7 @@ import env from "../server/data"
 
 
  
-// export async function getCollection(collectionName : string){
-//     const client = await clientPromise;
-//     const db = client.db('resume-builder')
-//     if(client) {
-//         return db.collection(collectionName)
-//     }
-//     return null
-// }
+
 
 
 export async function connectDB() {

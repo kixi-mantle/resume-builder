@@ -13,10 +13,13 @@ export default async function VerifyEmailPage({
     id: string;
   };
 }) {
-  const { token, id } = searchParams;
+  const { token, id } = await searchParams;
+  console.log(token)
 
   // Handle missing parameters
   if (!token || !id) {
+  console.log("there is no token or id ");
+  
     return (
       <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
         <h1 className="text-2xl font-bold text-red-600 mb-4">Invalid Verification Link</h1>

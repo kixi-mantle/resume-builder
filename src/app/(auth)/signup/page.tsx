@@ -31,11 +31,17 @@ const Page = () => {
     startTransition(async()=>{
 
       const res = await signUp(data)
-      if(!res.error) toast.error("Error" , {
+      if(res.error) {
+        
+        toast.error("Error" , {
         description : "Something went wrong. Please register again"
       } )
+      }else{
+         setSuccess(true)
+      }
+        
   
-        setSuccess(true)
+       
     })
 
 

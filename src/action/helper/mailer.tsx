@@ -1,20 +1,39 @@
 "use server"
 
-import nodemailer from 'nodemailer'
+import nodemailer, {TransportOptions} from 'nodemailer'
 import env from '../../server/data'
+import {google} from 'googleapis'
 
 
-const transporter = nodemailer.createTransport({
-    service : 'Gmail',
-    auth:{
-        user : env.EMAIL_USERNAME,
-        pass : env.EMAIL_PASSWORD
-    }
-})
+
+
+
+const oAuth2Client = new google.auth.OAuth2(
+  env.CLIENT_ID,
+  env.CLIENT_SECRET,
+  "https://developers.google.com/oauthplayground"
+  
+)
+
+oAuth2Client.setCredentials({refresh_token : env.REFRESH_TOKEN})
 
 export const sendVerificationEmail = async (email : string , token : string , id : string)=>{
+
+  const accessToken = await oAuth2Client.getAccessToken();
+
+  const transporter = nodemailer.createTransport({
+    service : 'gmail',
+    auth:{
+        type : "oauth2",
+        user: env.EMAIL_USERNAME,
+        clientId : env.CLIENT_ID,
+        clientSecret : env.CLIENT_SECRET,
+        refreshToken : env.REFRESH_TOKEN,
+        accessToken : accessToken.token
+    }
+} as TransportOptions)
           
-    const verificationUrl =  `http://localhost:3000/verify-email?token=${token}?id=${id}`
+    const verificationUrl =  `http://localhost:3000/verify-email?token=${token}&id=${id}`
 
     const mailOptions = {
         from : env.EMAIL_USERNAME,
