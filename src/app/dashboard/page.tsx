@@ -3,6 +3,9 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import Template_1 from '../../ResumeTemplate/resumes/Template-1';
+import { Template_1_type } from '../../ResumeTemplate/resumeSchema';
+import { useForm } from 'react-hook-form';
+import FormWrapper from '../resume/_components/FormWrapper';
 
 const Page = () => {
   const resumeData = {
@@ -63,9 +66,38 @@ const Page = () => {
   }
 };
 
+
+const defaultvalues : Template_1_type = {
+     name: '',
+  address: '',
+  phone: '',
+  email: '',
+  website: '',
+  photo: null,
+  summary: '',
+  experience: [],
+  education: [],
+  additionalInfo: {},
+}
+
 const previewRef = useRef<HTMLDivElement>(null)
 const [height , setHeight] = useState(1123);
 const [width , setWidth] = useState(794);
+const [defaultValues , setdefaultValues] = useState<Template_1_type>(defaultvalues);
+
+
+
+useEffect(()=>{
+   //call for data and provide the data to the defaultvalues
+  
+},[])
+
+const {register , watch , control } = useForm<Template_1_type>({
+  
+  defaultValues 
+})
+
+const formData : Template_1_type = watch();
 
 
 useEffect(()=>{
@@ -84,18 +116,19 @@ useEffect(()=>{
 
 
   return (
-    <div className = "container flex justify-center items-center ">
+    <div className = "h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)]  px-[2rem] py-[4rem] relative flex justify-between items-center ">
 
-        <div className='w-full flex'>
-
+       
             {/* form part */}
-            <div  className='basis-[50%]'>
+            <div  className='w-full lg:basis-[48%] h-full flex items-center '>
+              <FormWrapper form={formData} register={register} control={control}/>
 
             </div>
 
             {/* form preview */}
 
-            <div className='basis-[50%]  h-[600px] bg-red-50 relative overflow-hidden ' 
+            <div className='basis-[48%] p-[1rem] h-full  my-8 bg-red-50 relative overflow-x-hidden overflow-y-auto scroll [&::-webkit-scrollbar]:hidden hidden lg:block'
+           
             ref={previewRef}>
                  
             <Template_1 
@@ -104,7 +137,7 @@ useEffect(()=>{
               width={width} 
             />
           
-            </div>
+            
 
 
         </div>

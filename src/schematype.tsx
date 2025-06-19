@@ -24,3 +24,4 @@ export const SignupData = z.object({
     })
 
 })
+

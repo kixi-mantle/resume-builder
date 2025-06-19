@@ -1,25 +1,25 @@
 
 
-interface Education {
+export type  Education =  {
     degree : string,
     institution : string , 
     date : string , 
 }
 
-interface Experience {
+export type Experience  = {
   position: string;
   company: string;
   date: string;
-  achievements: string[];
+  achievements: string;
 }
 
-export interface Template_1_type {
+export type Template_1_type = {
   name: string;
   address: string;
   phone: string;
   email: string;
   website: string;
-  photo?: string | null;
+  photo: string | null;
   summary: string;
   experience: Experience[];
   education: Education[];

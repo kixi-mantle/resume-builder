@@ -14,14 +14,17 @@ const [scale , setScale] = useState(1);
 useEffect(()=>{
  
 
-const scaleValue = Math.min(
+const scaleValue = ((width || 794) -32)/ 794
+
   
-      (width || 794) / 794,
-      (height || 1123) / 1123
-    );
     setScale(scaleValue);
 
 },[width , height])
+
+
+
+
+
   if(scale == 1) {
     return (
       <div className="w-full h-full items-center justify-center">
@@ -31,18 +34,19 @@ const scaleValue = Math.min(
   }
 
   return (
-    <div className=" relative  shadow-lg rounded-lg border-2 "
+    <div className= {`resume   relative  shadow-lg rounded-lg border-2  `}
     style={{
-          width: '794px',
+          width: `794px`,
   height: '1123px',
-  maxWidth: '794px',
   transform: `scale(${scale})`,
-  transformOrigin: "top center",
-  margin: '0 auto'
-     }}
+  transformOrigin: "top left",
+  
+     }} 
+    
         >
         <div 
-        className='absolute top-0 left-0 w-full h-full  overflow-hidden overflow-x-hidden overflow-y-auto bg-white'  >
+        className=' w-full h-full    bg-white' 
+        >
       {/* Header Section */}
       <div className=" text-black p-6 pb-4 flex">
         <div className="flex justify-between items-center w-full">
