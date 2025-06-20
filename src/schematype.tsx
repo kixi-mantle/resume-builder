@@ -25,3 +25,8 @@ export const SignupData = z.object({
 
 })
 
+export type User = {
+    _id : string,
+    name: string , 
+    email: string
+}

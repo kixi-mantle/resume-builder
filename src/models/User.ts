@@ -23,6 +23,8 @@ export interface IUser extends Document {
     accessToken: string,
     refreshToken: string
   }
+
+    isPasswordMatch(password: string): Promise<boolean>;
 }
 
 const UserSchema : Schema<IUser> = new Schema(
@@ -62,11 +64,6 @@ const UserSchema : Schema<IUser> = new Schema(
 
 )
 
-const User : Model<IUser> = mongoose.models.user || mongoose.model("user" , UserSchema)
-
-export default User;
-
-
 UserSchema.methods.isPasswordMatch = async function(password : string) : Promise<boolean> {
      return await comparePassword({password , hashedPassword : this.passwordHash})
 }
@@ -77,3 +74,7 @@ UserSchema.pre<IUser>('save' , async function (next){
   }
   next();
 })
+const User : Model<IUser> = mongoose.models.user || mongoose.model("user" , UserSchema)
+
+export default User;
+

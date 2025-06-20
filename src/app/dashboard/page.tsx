@@ -3,9 +3,10 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import Template_1 from '../../ResumeTemplate/resumes/Template-1';
-import { Template_1_type } from '../../ResumeTemplate/resumeSchema';
+import { ResumeVlidation, Template_1_type } from '../../ResumeTemplate/resumeSchema';
 import { useForm } from 'react-hook-form';
 import FormWrapper from '../resume/_components/FormWrapper';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const Page = () => {
   const resumeData = {
@@ -77,7 +78,7 @@ const defaultvalues : Template_1_type = {
   summary: '',
   experience: [],
   education: [],
-  additionalInfo: {},
+  additionalInfo: '',
 }
 
 const previewRef = useRef<HTMLDivElement>(null)
@@ -93,7 +94,7 @@ useEffect(()=>{
 },[])
 
 const {register , watch , control } = useForm<Template_1_type>({
-  
+  resolver : zodResolver(ResumeVlidation),
   defaultValues 
 })
 
