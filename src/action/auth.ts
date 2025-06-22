@@ -11,7 +11,9 @@ import { cookies } from "next/headers"
 export const signUp = async (data : {name : string , email : string , password : string}) =>{
     try {
     await connectDB()
-    const newUser = await User.create(data)
+    const user = await User.findOne({email : data.email})
+    if(user) return {error : true , msg : "user already exist"}
+    const newUser = await User.create({...data , passwordHash : data.password})
 
     if(!newUser) return { error : true , msg : "Unexpected Error happen"}
 
@@ -21,7 +23,7 @@ export const signUp = async (data : {name : string , email : string , password :
         await newUser.save()
 
         await sendVerificationEmail(newUser.email! , token , newUser._id.toString())
-        return {error : false , msg : "verification"}
+        return {error : false , msg : "verification sent Successfully"}
     } catch (error) {
         console.error(error)
         return {error : true , msg : "verification"}
@@ -37,28 +39,30 @@ export const login = async ( {email  , password } : { email : string , password 
     const user = await User.findOne({email})
 
     if(!user) return { error : true , msg : "Invalid field"}
+    const ispasswordMatch = await user.isPasswordMatch(password)
 
-        if(user.isEmailVerified){
+    if(!ispasswordMatch){
+
+        return {error : true , msg : "Invalid field"}
+    }
+
+        if(!user.isEmailVerified){
         const token = await getVerificationToken()
         user.emailVerifyToken = token
         user.emailVerifyExpires = new Date(Date.now() + 10 * 60 * 1000)
         await user.save()
+        console.log("sending verification link");
+        
         await sendVerificationEmail(user.email! , token , user._id.toString())
         return {error : true , msg : 'verification'}
         }
 
-        const ispasswordMatch = await user.isPasswordMatch(password)
-
-        if(!ispasswordMatch){
-
-            return {error : true , msg : "Invalid field"}
-        }
         const cookieStore = await cookies()
 
 
         const token = await createJWT(user._id.toString())
 
-            cookieStore.set('session' , token , {
+          await  cookieStore.set('session' , token , {
                 httpOnly : true,
                 maxAge : 60 * 60 * 24 * 7 , 
                 sameSite : 'lax',
@@ -71,7 +75,7 @@ export const login = async ( {email  , password } : { email : string , password 
 
     } catch (error) {
         console.error(error)
-        return {error : true , msg : "verification"}
+        return {error : true , msg : error instanceof Error ? error.message : 'Unknown error'}
     }
 
 
@@ -80,34 +84,43 @@ export const login = async ( {email  , password } : { email : string , password 
 export const verifyEmail = async({token , id}:{token : string , id : string}) =>{
 
     try {
+        await connectDB()
+        console.log(" this is token " , token)
+        console.log(" this is id " , id)
         const user = await User.findById(new Types.ObjectId(id)).select("+emailVerifyToken");
         const cookieStore = await cookies()
-        if(!user) return {error: true , msg : "verification failed"}
+        if(!user) return {error: true , msg : "user doesnt exist failed"}
         const expire = user.emailVerifyExpires?.getTime()
     
 
     const isTokenMatch = user.emailVerifyToken == token ? true : false
+    if(!isTokenMatch){
+        return {error: true , msg : "Token didn't match" , token: null}
+    }
     
         if ( isTokenMatch&& expire && (Date.now() <= expire)){
             user.isEmailVerified = true;
+            user.emailVerifyToken = undefined;
+            user.emailVerifyExpires = undefined;
             await user.save()
 
-            const token = await createJWT(user._id.toString())
+            const sessiontoken = await createJWT(user._id.toString())
 
-            cookieStore.set('session' , token , {
-                httpOnly : true,
-                maxAge : 60 * 60 * 24 * 7 , 
-                sameSite : 'lax',
+        //    await cookieStore.set('session' , setoken , {
+        //         httpOnly : true,
+        //         maxAge : 60 * 60 * 24 * 7 , 
+        //         sameSite : 'lax',
                 
-            })
+        //     })
+        
 
-            return {error: false , msg : "verification successfull"}
+            return {error: false ,msg : "verification succes", token : sessiontoken}
         }
-            return {error: true , msg : "verification failed"}
+            return {error: true , msg : "Token has alrady expired" , token : null}
         
     } catch (error) {
      console.error(error)
-     return {error: true , msg : "verification failed"}   
+     return {error: true , msg : "verification failed"  , token : null}   
     }
 
     
@@ -125,7 +138,7 @@ const sessionCookie = (await  cookies()).get('session')?.value
 
     
     
-    const {userId} = verifyJWT(sessionCookie)
+    const {userId} = await verifyJWT(sessionCookie)
     const user = await User.findById(userId).select('name email _id').lean()
 
      if (!user) {
@@ -133,5 +146,5 @@ const sessionCookie = (await  cookies()).get('session')?.value
       
     }
 
-   return {error : false , data : { id: user._id,name: user.name,email: user.email}}
+   return {error : false , data : { id: user._id.toString(),name: user.name,email: user.email}}
 }

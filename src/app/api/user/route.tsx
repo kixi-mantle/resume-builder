@@ -23,7 +23,7 @@ export async function GET() {
 
     
     
-    const {userId} = verifyJWT(sessionCookie)
+    const {userId} = await verifyJWT(sessionCookie)
     const user = await User.findById(userId).select('name email _id').lean()
 
      if (!user) {

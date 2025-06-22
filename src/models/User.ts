@@ -12,6 +12,7 @@ export interface IUser extends Document {
   email?: string;
   passwordHash?: string;
   googleId? : string,
+  resumeIds : [Types.ObjectId]
 
   authType : authEnum
   createdAt: Date;
@@ -43,6 +44,11 @@ const UserSchema : Schema<IUser> = new Schema(
     type: String,
     select: false // Never return password in queries
   },
+
+  resumeIds : {
+    type : [Schema.Types.ObjectId],
+    ref : 'resume'
+  },
   
   
   // Fields for Google OAuth
@@ -65,11 +71,18 @@ const UserSchema : Schema<IUser> = new Schema(
 )
 
 UserSchema.methods.isPasswordMatch = async function(password : string) : Promise<boolean> {
+
+  if(!password || !this.passwordHash) {
+    console.error("args missing")
+    return false 
+  }
+
      return await comparePassword({password , hashedPassword : this.passwordHash})
 }
 
 UserSchema.pre<IUser>('save' , async function (next){
   if(this.isModified('passwordHash') && this.passwordHash){
+    
     this.passwordHash = await passwordHash(this.passwordHash)
   }
   next();

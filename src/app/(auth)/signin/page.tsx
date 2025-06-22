@@ -2,42 +2,49 @@
 
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { SignupData } from "../../../schematype";
+import { SignInData } from "../../../schematype";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../../../components/ui/form";
 import { Input } from "../../../components/ui/input";
-import { signUp } from "../../../action/auth";
+import { login } from "../../../action/auth";
 import { toast } from "sonner";
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import {zodResolver} from '@hookform/resolvers/zod'
+import { redirect } from "next/navigation";
 
 
 
 const Page = () => {
 
-  const form = useForm<z.infer<typeof SignupData>>({
-    resolver : zodResolver(SignupData),
-   defaultValues : { name: "",
+  const form = useForm<z.infer<typeof SignInData>>({
+    resolver : zodResolver(SignInData),
+   defaultValues : {
     email: "",
     password: "",}
   })
 
-  const [success , setSuccess ] = useState(false) 
+  const [link , setLink ] = useState(false) 
   const [isPending , startTransition] = useTransition()
 
 
-  const onSubmit = async(data :z.infer<typeof SignupData> )=>{
+  const onSubmit = async(data :z.infer<typeof SignInData> )=>{
 
     startTransition(async()=>{
 
-      const res = await signUp(data)
+      const res = await login(data)
       if(res.error) {
+
+        if(res.msg == "verification"){
+            setLink(true)
+        }else{
+
+            toast.error("Error" , {
+            description : res.msg as string
+          } )
+        }
         
-        toast.error("Error" , {
-        description : res.msg
-      } )
       }else{
-         setSuccess(true)
+         redirect('/dashboard')
       }
         
   
@@ -64,23 +71,7 @@ const Page = () => {
         <Form {...form}>
            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-3">
             <h1 className="text-5xl font-bold text-accent text-center">Registration</h1>
-            <FormField
-            control={form.control}
-            name = "name"
-            render={({field , fieldState})=>(
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <div><Input {...field}/>
-                  {fieldState.error && (
-        <span className="text-red-500 text-sm">{fieldState.error.message}</span>
-      )}</div>
-                  </FormControl>   
-              </FormItem>        
-
-            )}>
-
-            </FormField>
+           
             <FormField
             control={form.control}
             name = "email"
@@ -125,9 +116,9 @@ const Page = () => {
         </div>
         
         {
-          success && 
+          link && 
        <div className=" w-full text-center mt-3 font-semibold">
-        A verification link has been sent to your email. Please check your  <Link href="https://gmail.com" target="_blank" rel="noopener noreferrer" className="underline text-red-500">Gmail</Link>
+        This email hasnt been verified yet. A verification link has been sent to your email. Please check your  <Link href="https://gmail.com" target="_blank" rel="noopener noreferrer" className="underline text-red-500">Gmail</Link>
        </div>
         }
 

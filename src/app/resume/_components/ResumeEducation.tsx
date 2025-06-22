@@ -1,8 +1,11 @@
 import { Control, useFieldArray, UseFormRegister } from "react-hook-form";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Education as EducationType, Template_1_type } from "../../../ResumeTemplate/resumeSchema";
 import { Button } from "@/components/ui/button";
 import {  X } from "lucide-react";
+
+import 'prosemirror-view/style/prosemirror.css';
+
 
 export type ResumeEducationProps = {
   data: EducationType[];
@@ -12,7 +15,7 @@ export type ResumeEducationProps = {
 };
 
 
-const Education = ({ data, register, control }: ResumeEducationProps) => {
+const Education = ({ register, control }: ResumeEducationProps) => {
 
     
   const { fields, append, remove } = useFieldArray({
@@ -31,9 +34,14 @@ const Education = ({ data, register, control }: ResumeEducationProps) => {
   return (
     <div className="flex   flex-col space-y-4 overflow-y-auto w-full">
       { fields.map((education, index) => (
-        <Card key={index} className="border-gray-400 shadow-sm relative">
+        <Card key={index} className="border-gray-300 bg-transparent shadow-sm relative">
 
             <X className="absolute right-2 top-2 hover:text-red-500 cursor-pointer text-sm" onClick={()=>remove(index)}></X>
+            <CardHeader>
+              <CardTitle>
+                Work Experience {index + 1}
+              </CardTitle>
+            </CardHeader>
          
           <CardContent className="space-y-2 text-gray-700">
             <div>

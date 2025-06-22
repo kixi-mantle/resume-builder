@@ -14,8 +14,10 @@ export async function passwordHash(password : string){
 }
 
 export async function comparePassword({hashedPassword , password} : { hashedPassword : string , password : string}){
+
+    if(!hashedPassword || !password) return false
     
-    const matched = bcrypt.compare(password , hashedPassword);
+    const matched = await  bcrypt.compare(password , hashedPassword);
     return matched
 }
 
@@ -35,7 +37,7 @@ const getJwtSecret = (): jwt.Secret => {
 
 
 
-export function createJWT(userId: string): string {
+export async function createJWT(userId: string): Promise<string> {
   
 
     const payload : JwtPayload = {
@@ -48,6 +50,6 @@ export function createJWT(userId: string): string {
 }
 
 
-export function verifyJWT(token : string) : JWTPayload {
+export async function verifyJWT(token : string) : Promise<JWTPayload> {
     return jwt.verify(token , getJwtSecret()) as JWTPayload
 }

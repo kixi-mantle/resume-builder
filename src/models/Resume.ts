@@ -6,25 +6,19 @@ import {  Template_1_type } from "../ResumeTemplate/resumeSchema";
 
 export interface IResume extends Document , Template_1_type {
     _id : Types.ObjectId,
+    title : string ,
     owner_id : Types.ObjectId
   
 }
 
-// const ExperienceSchema = new Schema<Experience>({
-//   position: { type: String, required: true },
-//   company: { type: String, required: true },
-//   date: { type: String, required: true },
-//   achievements: { type: String, required: true }
-// })
 
-// const EducationSchema = new Schema<Education>({
-//   degree: { type: String, required: true },
-//   institution: { type: String, required: true },
-//   year: { type: String, required: true }
-// }, { _id: true });
 
 const ResumeSchema : Schema<IResume> = new Schema({
-
+    
+  title : {
+    type : String,
+    unique : true
+  },
    name: { type: String, required: true, trim: true },
   address: { type: String, required: true, trim: true },
   phone: { type: String, required: true, trim: true },
@@ -64,7 +58,7 @@ const ResumeSchema : Schema<IResume> = new Schema({
   owner_id: { 
     type: Schema.Types.ObjectId, 
     required: true,
-    ref: 'User' 
+    ref: 'user' 
   }
 },)
 

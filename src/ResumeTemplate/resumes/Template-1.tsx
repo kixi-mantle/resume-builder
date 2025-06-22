@@ -72,10 +72,14 @@ const scaleValue = ((width || 794) -32)/ 794
       {/* Main Content */}
       <div className="p-6">
         {/* Summary */}
+      {
+        data.summary && (
         <section className="mb-8">
           <h2 className="text-xl font-bold text-purple-700 border-b-2 border-purple-200 pb-1 mb-3">SUMMARY</h2>
-          <p className="text-gray-700">{data.summary}</p>
+          <div className="text-gray-700" dangerouslySetInnerHTML={{__html : data.summary}}></div>
         </section>
+        )
+      }
 
         {/* Experience */}
         <section className="mb-8">
@@ -87,11 +91,8 @@ const scaleValue = ((width || 794) -32)/ 794
                 <span className="text-sm text-gray-500">{exp.date}</span>
               </div>
               <h4 className="text-md font-medium text-gray-600 mb-2">{exp.company}</h4>
-              <ul className="list-disc pl-5 space-y-1 text-gray-700">
-                {exp.achievements.map((achievement, i) => (
-                  <li key={i}>{achievement}</li>
-                ))}
-              </ul>
+              <div className="  space-y-1 text-gray-700" dangerouslySetInnerHTML={{__html:exp.achievements}}>
+              </div>
             </div>
           ))}
         </section>
@@ -112,17 +113,17 @@ const scaleValue = ((width || 794) -32)/ 794
         </section>
 
         {/* Additional Info */}
+        {
+          data.additionalInfo && (
         <section>
           <h2 className="text-xl font-bold text-purple-700 border-b-2 border-purple-200 pb-1 mb-3">ADDITIONAL INFORMATION</h2>
-          <div className="grid grid-cols-1 gap-2">
-            {Object.entries(data.additionalInfo).map(([key , val],idx)=>(
-                <div key={idx}>
-              <h3 className="font-semibold text-gray-800 inline">{key} : </h3>
-              <p className="text-gray-700 inline">{val}</p>
-            </div>
-            ))}
+          <div dangerouslySetInnerHTML={{__html : data.additionalInfo}}>
+            
           </div>
         </section>
+
+          )
+        }
       </div>
       </div>
     </div>

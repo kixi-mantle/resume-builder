@@ -19,7 +19,8 @@ oAuth2Client.setCredentials({refresh_token : env.REFRESH_TOKEN})
 
 export const sendVerificationEmail = async (email : string , token : string , id : string)=>{
 
-  const accessToken = await oAuth2Client.getAccessToken();
+  try {
+    const accessToken = await oAuth2Client.getAccessToken();
 
   const transporter = nodemailer.createTransport({
     service : 'gmail',
@@ -70,5 +71,12 @@ export const sendVerificationEmail = async (email : string , token : string , id
     }
 
     await transporter.sendMail(mailOptions)
+    
+  } catch (error) {
+    throw error
+    
+  }
+
+  
 }
 
