@@ -1,5 +1,5 @@
-import {   useForm, } from "react-hook-form"
-import { ResumeVlidation, Template_1_type } from "../../../ResumeTemplate/resumeSchema"
+import {   Control, UseFormHandleSubmit, UseFormRegister, UseFormSetValue, } from "react-hook-form"
+import {  Template_1_type } from "../../../../ResumeTemplate/resumeSchema"
 import PersonalInfo, { PersonalInfoProps } from "./PersonalData"
 import Summary, { SummaryProps } from "./ResumeSummary"
 import {
@@ -12,8 +12,7 @@ import {
 import { useState, useTransition } from "react"
 import WorkExperience, { ResumeExperienceProps } from "./ResumeExperience"
 import Education, { ResumeEducationProps } from "./ResumeEducation"
-import { updateResume } from "../../../action/resumeAction"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { updateResume } from "../../../../action/resumeAction"
 import { toast } from "sonner"
 import AdditionalInfo, { InfoProps } from "./AdditionalInfo"
 
@@ -24,33 +23,22 @@ type ComponentKey<T> = {
   name : string
 };
 
+type FormWrapperProps = {
+    form : Template_1_type ,
+    register : UseFormRegister<Template_1_type>,
+    control : Control<Template_1_type>,
+    handleSubmit : UseFormHandleSubmit<Template_1_type>
+    setValue : UseFormSetValue<Template_1_type>
+}
 
 
 
-const FormWrapper  =() => {
+const FormWrapper  =({form , register , control , handleSubmit , setValue} : FormWrapperProps) => {
 
 
   
-  const defaultvalues : Template_1_type = {
-       name: '',
-    address: '',
-    phone: '',
-    email: '',
-    website: '',
-    photo: null,
-    summary: '',
-    experience: [],
-    education: [],
-    additionalInfo: '',
-  }
-
-
-  const {register , watch , control , handleSubmit , setValue } = useForm<Template_1_type>({
-    resolver : zodResolver(ResumeVlidation),
-    defaultValues : defaultvalues 
-  })
   
-  const form : Template_1_type = watch();
+
    const components : Record<string, ComponentKey<any>> = {
     '1' : {
         component : PersonalInfo , 
@@ -115,11 +103,11 @@ const FormWrapper  =() => {
   };
 
   const handleSave =  (data : Template_1_type) => {
-      // startTransition(async()=>{
+      startTransition(async()=>{
         
-      //   const res  = await updateResume({resumeId : 'ahdfkahdjfha', updateData : data})
-      //   if (res.error) toast.error('Error' , )
-      // })
+        const res  = await updateResume({resumeId : 'ahdfkahdjfha', updateData : data})
+        if (res.error) toast.error('Error' , )
+      })
 
       console.log(data);
       

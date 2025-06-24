@@ -1,8 +1,8 @@
 
 "use server"
 
+import { revalidateTag } from "next/cache";
 import { Template_1_type } from "../ResumeTemplate/resumeSchema";
-import { ResumeInfo } from "../app/dashboard/DashboardPage";
 import { connectDB } from "../lib/mongodb";
 import Resume from "../models/Resume";
 import User from "../models/User";
@@ -10,27 +10,32 @@ import { ObjectId } from "mongodb";
 
 export const createResume = async ({
   ownerId,
-  resumeData
+  resumeData,
+  title
 } : {
    ownerId : string,
-  resumeData : Template_1_type
-}) => {
+  resumeData : Template_1_type, title : string
+}) : Promise<{error : boolean , msg : string , data :{id : string , title : string , createdAt : string } | null }> => {
   try {
     await connectDB()
     const user = await User.findById(ownerId)
-    if(!user) return {error : true , msg: "User doesn't exist"}
+    if(!user) return {error : true , msg: "User doesn't exist" , data : null}
     const newResume = new Resume({
       ...resumeData,
-      owner_id: ownerId
+      owner_id: ownerId,
+      title 
     });
 
 
     const savedResume = await newResume.save();
-    return {error : false , data : savedResume};
+    user.resumeIds.push(savedResume._id)
+    await user.save()
+    revalidateTag(`user-${ownerId}-resume`)
+    return {error : false , msg : `${savedResume.title} was created sucessfully` , data : { id : savedResume._id.toString() , title : savedResume.title , createdAt : savedResume.createdAt.toISOString()}};
 
   } catch (error) {
     console.error("Error creating resume:", error);
-    return {error : true , msg : "Something went wrong" };
+    return {error : true , msg : "Something went wrong"  , data : null};
 
   }
 };
@@ -60,6 +65,12 @@ export const updateResume = async ({
 };
 
 
+type ResumeInfo = {
+  id :string ,
+  title : string , 
+  createdAt : string ,
+}
+
 
 export const getResumeFromUser = async(id : string) : Promise<ResumeInfo[]>=>{
 
@@ -71,18 +82,36 @@ export const getResumeFromUser = async(id : string) : Promise<ResumeInfo[]>=>{
       options : {sort : {createdAt : -1}}
     });
 
-   return user?.resumeIds?.map( val => toClientResume(val))  || []; 
+   return user?.resumeIds ?  await Promise.all(user.resumeIds.map( (val) =>  toClientResume(val))) : []; 
 }
 
 // Convert MongoDB document to client-safe type
-export function toClientResume(doc: {
+export async  function toClientResume(doc: {
   _id: ObjectId;
   title: string;
   createdAt: Date;
-}): ResumeInfo {
+}):Promise<ResumeInfo> {
   return {
-    _id: doc._id.toString(),
+    id: doc._id.toString(),
     title: doc.title,
     createdAt: doc.createdAt.toISOString()
   };
 }
+
+export async function getResume(id: string ){
+    
+  try {
+    await connectDB();
+    const  resume = await Resume.findById(id).lean()
+    if(!resume) return null
+
+ 
+    return {
+      ...resume , _id : resume._id.toString() , owner_id : resume.owner_id.toString()
+    }
+  } catch (error) {
+   
+    throw error 
+  }
+}
+

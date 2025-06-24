@@ -37,7 +37,7 @@ export default async function VerifyEmailPage({
    
      
     const res = await fetch(`http://localhost:3000/api/verify-email?token=${token}&id=${id}`, {
-      method: "POST",
+      method: "GET",
        headers: {
     'Content-Type': 'application/json',
   },
@@ -48,8 +48,10 @@ export default async function VerifyEmailPage({
     const data = await res.json();
     console.log(data.message)
 
+    
+
     if (data.success) {
-      // Redirect to dashboard on success
+     
       redirect('/dashboard');
     } else{
       return (

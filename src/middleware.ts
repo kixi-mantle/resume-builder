@@ -29,11 +29,7 @@ export function middleware(request : NextRequest){
     const isVerified = !!session?.value
 
      // Debug logging (remove in production)
-  console.log('Middleware check:', {
-    path: pathname,
-    hasCookie: !!session,
-    cookieLength: session?.value?.length
-  });
+ 
 
 
     const isPrivate = ROUTE_CONFIG.private.some(path => 

@@ -4,18 +4,15 @@ import User from "../../../models/User";
 import { Types } from "mongoose";
 import { createJWT } from "../../../server/safety";
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
     try {
-        console.log('\n[Verify Email] Starting verification process');
         
         const searchParams = request.nextUrl.searchParams;
         const token = searchParams.get('token');
         const id = searchParams.get('id');
 
-        console.log(`\n[Verify Email] Received token: ${token?.substring(0, 5)}..., id: ${id}`);
 
         if (!token || !id) {
-            console.error('\n[Verify Email] Missing token or id');
             return NextResponse.json({
                 success: false,
                 message: "Missing verification parameters",
@@ -24,12 +21,10 @@ export async function POST(request: NextRequest) {
         }
 
         await connectDB();
-        console.log('\n[Verify Email] Connected to DB');
 
         const user = await User.findById(new Types.ObjectId(id)).select("+emailVerifyToken +emailVerifyExpires");
         
         if (!user) {
-            console.error('\n[Verify Email] User not found');
             return NextResponse.json({
                 success: false,
                 message: "Account not found",
@@ -37,13 +32,10 @@ export async function POST(request: NextRequest) {
             }, { status: 404 });
         }
 
-        console.log(`\n[Verify Email] User found: ${user.email}`);
 
         // Verify token match
         if (user.emailVerifyToken !== token) {
-            console.error('\n[Verify Email] Token mismatch');
-            console.log(`Stored token: ${user.emailVerifyToken?.substring(0, 5)}...`);
-            console.log(`Received token: ${token.substring(0, 5)}...`);
+            
             
             return NextResponse.json({
                 success: false,
@@ -73,10 +65,9 @@ export async function POST(request: NextRequest) {
         // Create session
         const sessiontoken = await createJWT(user._id.toString())
         const response =  NextResponse.json({
-            success: true,
-            message: "Email verified successfully",
-            redirectUrl: "/dashboard"
-        });
+            success : true ,
+            message : "Account verified successsfully"
+        })
         response.cookies.set('session', sessiontoken, {
     httpOnly: true,
     secure: false,

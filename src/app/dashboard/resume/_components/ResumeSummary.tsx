@@ -1,7 +1,7 @@
 "use client"
 
 import {  UseFormSetValue } from "react-hook-form"
-import { Template_1_type } from "../../../ResumeTemplate/resumeSchema"
+import { Template_1_type } from "../../../../ResumeTemplate/resumeSchema"
 import {useEditor  } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import EditorCom from "./Editor"

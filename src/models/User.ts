@@ -9,7 +9,7 @@ type authEnum   = typeof auth[number]
 export interface IUser extends Document {
   _id : Types.ObjectId; 
   name: string;
-  email?: string;
+  email: string;
   passwordHash?: string;
   googleId? : string,
   resumeIds : [Types.ObjectId]
@@ -34,7 +34,6 @@ const UserSchema : Schema<IUser> = new Schema(
         email: {
     type: String,
     unique: true,
-    sparse: true // Allows null for Google users who haven't provided email
   },
   name: String,
   createdAt: { type: Date, default: Date.now },
@@ -42,7 +41,8 @@ const UserSchema : Schema<IUser> = new Schema(
   // Fields for email/password auth
   passwordHash: {
     type: String,
-    select: false // Never return password in queries
+    select: false ,// Never return password in queries
+    sparse : true
   },
 
   resumeIds : {

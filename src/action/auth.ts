@@ -1,7 +1,7 @@
 "use server"
 
 import { Types } from "mongoose"
-import { createJWT, getVerificationToken, verifyJWT } from "../server/safety"
+import { comparePassword, createJWT, getVerificationToken, verifyJWT } from "../server/safety"
 import { sendVerificationEmail } from "./helper/mailer"
 import { connectDB } from "../lib/mongodb"
 import User from "../models/User"
@@ -16,6 +16,8 @@ export const signUp = async (data : {name : string , email : string , password :
     const newUser = await User.create({...data , passwordHash : data.password})
 
     if(!newUser) return { error : true , msg : "Unexpected Error happen"}
+
+
 
         const token = await getVerificationToken()
         newUser.emailVerifyToken = token
@@ -36,25 +38,31 @@ export const signUp = async (data : {name : string , email : string , password :
 export const login = async ( {email  , password } : { email : string , password : string  }) =>{
     try {
     await connectDB()
-    const user = await User.findOne({email})
+    const user = await User.findOne({email}).select("+passwordHash")
+    console.log(user);
+    
 
     if(!user) return { error : true , msg : "Invalid field"}
-    const ispasswordMatch = await user.isPasswordMatch(password)
+    const ispasswordMatch = await comparePassword({password , hashedPassword : user.passwordHash!})
 
     if(!ispasswordMatch){
 
         return {error : true , msg : "Invalid field"}
     }
 
-        if(!user.isEmailVerified){
-        const token = await getVerificationToken()
-        user.emailVerifyToken = token
-        user.emailVerifyExpires = new Date(Date.now() + 10 * 60 * 1000)
-        await user.save()
-        console.log("sending verification link");
+        if(!user.isEmailVerified ){
+            if(!user.emailVerifyToken || (user.emailVerifyExpires && (Date.now() <= user.emailVerifyExpires.getTime())) )
+            {
+                const token = await getVerificationToken()
+                user.emailVerifyToken = token
+                user.emailVerifyExpires = new Date(Date.now() + 10 * 60 * 1000)
+                await user.save()
+                console.log("sending verification link");
+                await sendVerificationEmail(user.email! , token , user._id.toString())
+                return {error : true , msg : 'verification'}
+            }
+
         
-        await sendVerificationEmail(user.email! , token , user._id.toString())
-        return {error : true , msg : 'verification'}
         }
 
         const cookieStore = await cookies()
@@ -66,6 +74,7 @@ export const login = async ( {email  , password } : { email : string , password 
                 httpOnly : true,
                 maxAge : 60 * 60 * 24 * 7 , 
                 sameSite : 'lax',
+                path:'/'
                 
             })
 
@@ -106,12 +115,12 @@ export const verifyEmail = async({token , id}:{token : string , id : string}) =>
 
             const sessiontoken = await createJWT(user._id.toString())
 
-        //    await cookieStore.set('session' , setoken , {
-        //         httpOnly : true,
-        //         maxAge : 60 * 60 * 24 * 7 , 
-        //         sameSite : 'lax',
+           await cookieStore.set('session' , sessiontoken , {
+                httpOnly : true,
+                maxAge : 60 * 60 * 24 * 7 , 
+                sameSite : 'lax',
                 
-        //     })
+            })
         
 
             return {error: false ,msg : "verification succes", token : sessiontoken}
@@ -131,7 +140,7 @@ export async function getUserFromSession(){
 const sessionCookie = (await  cookies()).get('session')?.value
     
     if (!sessionCookie) {
-      return {error : true , msg : "Unauthorized access"}
+      return {error : true , msg : "Unauthorized access" , data : null}
     }
 
  await connectDB()
@@ -142,7 +151,7 @@ const sessionCookie = (await  cookies()).get('session')?.value
     const user = await User.findById(userId).select('name email _id').lean()
 
      if (!user) {
-      return {error : true , msg : "Unauthorized access"}
+      return {error : true , msg : "Unauthorized access" , data : null}
       
     }
 

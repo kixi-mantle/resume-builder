@@ -1,4 +1,6 @@
-import React, { useState } from 'react'
+"use client"
+
+import React, { useEffect, useState, useTransition } from 'react'
 
 import { format } from 'date-fns'
 import {
@@ -28,18 +30,75 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { MoreVertical, FilePlus2 } from 'lucide-react'
 import Link from 'next/link'
+import { Template_1_type } from '../../ResumeTemplate/resumeSchema'
+import { createResume, getResumeFromUser } from '../../action/resumeAction'
+import { toast } from 'sonner'
+import { useUpdateStore } from '../../store/data'
 
-export type ResumeInfo = {
-  _id : string , 
+export type DashboardContentProps = {
+  resumes : {id : string , 
   title : string , 
-  createdAt : string,
+  createdAt : string,}[] ,
+  user : {
+    id : string , 
+    name : string ,
+    email : string
+  }
 }
-export const DashboardContent = ({resumes} : { resumes : ResumeInfo[] })=>{
+export const DashboardContent = ({user} :{ user : DashboardContentProps['user']})=>{
      const [title, setTitle] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [ispending , startTransition] = useTransition()
+  const [resumes , setResumes] = useState<DashboardContentProps['resumes'] | null>(null)
+  const {resumePartialUpdate , setResumePartialUpdate} = useUpdateStore()
 
-  const createResume = ()=>{
 
+  useEffect(()=>{
+    const fetchResumes = async()=>{
+      const res = await getResumeFromUser(user.id)
+      setResumes(res)
+    }
+
+    fetchResumes()
+  } , [user])
+
+  const handleCreate = async()=>{
+     const defaultvalues : Template_1_type = {
+      
+           name: '',
+        address: '',
+        phone: '',
+        email: '',
+        website: '',
+        photo: null,
+        summary: '',
+        experience: [],
+        education: [],
+        additionalInfo: '',
+      }
+
+        startTransition(async()=>{
+          const res = await createResume({ownerId : user.id , resumeData : defaultvalues , title})
+          setIsOpen(false)
+          
+          if(res.data !== null){
+            toast.success("Success" , {
+              description : res.msg
+            })
+              const newResume = res.data
+             setResumes((prev) => {
+              if (prev == null) {
+                return [newResume]
+              }
+              return [...prev , newResume]
+             })
+          }else {
+             toast.error("Error" , {
+              description : res.msg
+            })
+          }
+          
+        })
     
   }
     return (
@@ -83,8 +142,8 @@ export const DashboardContent = ({resumes} : { resumes : ResumeInfo[] })=>{
                 </Button>
                 <Button 
                   className="bg-red-700 hover:bg-red-800 text-white"
-                  onClick={createResume}
-                  disabled={!title.trim()}
+                  onClick={handleCreate}
+                  disabled={!title.trim() || ispending }
                 >
                   Create
                 </Button>
@@ -95,15 +154,22 @@ export const DashboardContent = ({resumes} : { resumes : ResumeInfo[] })=>{
 
         <div className="border rounded-lg bg-white shadow-sm">
           <Table>
-            {resumes.length === 0 ? (
+            { resumes == null ? (
+              <TableBody>
+                <TableRow>
+                <TableCell>
+
+              <div className='w-10 h-10 rounded-full border-t-transparent border-4 animate-spin border-red-400 mx-auto my-4'></div>
+                </TableCell>
+                </TableRow>
+                
+              </TableBody>
+
+            ) : resumes.length === 0 ? (
               <TableCaption className="py-8">
                 <div className="text-center space-y-4">
-                  <p className="text-gray-600">No resumes yet</p>
-                  <Link href="/resumes/create">
-                    <Button className="bg-red-700 hover:bg-red-800 text-white">
-                      Create your first resume
-                    </Button>
-                  </Link>
+                  <p className="text-xl font-semibold text-accent">No resumes yet</p>
+                  
                 </div>
               </TableCaption>
             ) : (
@@ -115,9 +181,9 @@ export const DashboardContent = ({resumes} : { resumes : ResumeInfo[] })=>{
                     <TableHead className="text-right text-red-900">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
-                  {resumes.map((resume) => (
-                    <TableRow key={resume._id}>
+                <TableBody className=''>
+                  { resumes.map((resume) => (
+                    <TableRow key={resume.id}>
                       <TableCell className="font-medium">{resume.title}</TableCell>
                       <TableCell>
                         {format(new Date(resume.createdAt), 'MMM dd, yyyy')}
@@ -125,22 +191,22 @@ export const DashboardContent = ({resumes} : { resumes : ResumeInfo[] })=>{
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
+                            <Button variant="ghost" className="h-8 w-8 p-0 hover:text-white">
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="bg-white">
-                            <DropdownMenuItem className="cursor-pointer hover:bg-red-50">
-                              View
+                            <DropdownMenuItem className="cursor-pointer hover:bg-red-400 ">
+                              <Link href={'/'} className='w-full h-full   hover:text-white'>View</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer hover:bg-red-50">
-                              Edit
+                            <DropdownMenuItem className="cursor-pointer hover:bg-red-400 ">
+                               <Link href={`dashboard/resume/${resume.id}`} className='w-full h-full   hover:text-white'>Edit</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer hover:bg-red-50">
-                              Download
+                            <DropdownMenuItem className="cursor-pointer hover:bg-red-400 " asChild>
+                              <div className='w-full h-full hover:text-white'>Download</div>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer text-red-600 hover:bg-red-50">
-                              Delete
+                            <DropdownMenuItem className="cursor-pointer text-red-600 hover:bg-red-400 " asChild>
+                             <div className='w-full h-full hover:text-white'>delete</div>
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>

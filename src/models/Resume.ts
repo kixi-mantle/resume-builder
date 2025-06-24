@@ -7,7 +7,9 @@ import {  Template_1_type } from "../ResumeTemplate/resumeSchema";
 export interface IResume extends Document , Template_1_type {
     _id : Types.ObjectId,
     title : string ,
-    owner_id : Types.ObjectId
+    owner_id : Types.ObjectId,
+    createdAt: Date;   
+  updatedAt: Date;
   
 }
 
@@ -17,14 +19,15 @@ const ResumeSchema : Schema<IResume> = new Schema({
     
   title : {
     type : String,
-    unique : true
+    unique : true,
+    required : true,
   },
-   name: { type: String, required: true, trim: true },
-  address: { type: String, required: true, trim: true },
-  phone: { type: String, required: true, trim: true },
+   name: { type: String,  trim: true },
+  address: { type: String ,trim: true },
+  phone: { type: String, trim: true },
   email: { 
     type: String, 
-    required: true,
+
     trim: true,
     lowercase: true,
   },
@@ -35,22 +38,22 @@ const ResumeSchema : Schema<IResume> = new Schema({
   additionalInfo: { type: String, trim: true },
  
   // Required Sections
-  summary: { type: String, required: true, trim: true },
+  summary: { type: String,  trim: true },
   
   // Experience Array (defined inline)
   experience: [{
-    position: { type: String, required: true },
-    company: { type: String, required: true },
-    date: { type: String, required: true },
-    achivement: { type: String, required: true },
+    position: { type: String,  },
+    company: { type: String,  },
+    date: { type: String,  },
+    achivement: { type: String,  },
     // You can add more fields as needed
   }],
   
   // Education Array (defined inline)
   education: [{
-    degree: { type: String, required: true },
-    institution: { type: String, required: true },
-    date: { type: String, required: true },
+    degree: { type: String, },
+    institution: { type: String, },
+    date: { type: String, },
     // Additional education fields can be added here
   }],
   
@@ -60,7 +63,7 @@ const ResumeSchema : Schema<IResume> = new Schema({
     required: true,
     ref: 'user' 
   }
-},)
+},{timestamps : true})
 
 const Resume : Model<IResume> = mongoose.models.resume || mongoose.model("resume" , ResumeSchema)
 

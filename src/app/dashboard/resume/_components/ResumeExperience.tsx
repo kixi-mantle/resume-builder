@@ -1,6 +1,6 @@
 import { Control, useFieldArray, UseFormRegister, UseFormSetValue, useFormState } from "react-hook-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Experience, Template_1_type } from "../../../ResumeTemplate/resumeSchema";
+import { Experience, Template_1_type } from "../../../../ResumeTemplate/resumeSchema";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useEditor } from "@tiptap/react";

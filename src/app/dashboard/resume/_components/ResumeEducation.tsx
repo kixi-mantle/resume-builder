@@ -1,6 +1,6 @@
 import { Control, useFieldArray, UseFormRegister } from "react-hook-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Education as EducationType, Template_1_type } from "../../../ResumeTemplate/resumeSchema";
+import { Education as EducationType, Template_1_type } from "../../../../ResumeTemplate/resumeSchema";
 import { Button } from "@/components/ui/button";
 import {  X } from "lucide-react";
 
