@@ -66,6 +66,7 @@ export const DashboardContent = ({user} :{ user : DashboardContentProps['user']}
      const defaultvalues : Template_1_type = {
       
            name: '',
+           occupation : '',
         address: '',
         phone: '',
         email: '',
@@ -200,7 +201,7 @@ export const DashboardContent = ({user} :{ user : DashboardContentProps['user']}
                               <Link href={'/'} className='w-full h-full   hover:text-white'>View</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem className="cursor-pointer hover:bg-red-400 ">
-                               <Link href={`dashboard/resume/${resume.id}`} className='w-full h-full   hover:text-white'>Edit</Link>
+                               <Link href={`dashboard/resume/${resume.id}/edit`} className='w-full h-full   hover:text-white'>Edit</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem className="cursor-pointer hover:bg-red-400 " asChild>
                               <div className='w-full h-full hover:text-white'>Download</div>

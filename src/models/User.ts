@@ -9,6 +9,7 @@ type authEnum   = typeof auth[number]
 export interface IUser extends Document {
   _id : Types.ObjectId; 
   name: string;
+  occupation : string;
   email: string;
   passwordHash?: string;
   googleId? : string,
@@ -36,6 +37,7 @@ const UserSchema : Schema<IUser> = new Schema(
     unique: true,
   },
   name: String,
+  occupation: String,
   createdAt: { type: Date, default: Date.now },
   
   // Fields for email/password auth

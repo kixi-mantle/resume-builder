@@ -49,6 +49,7 @@ const FormWrapper  =({form , register , control , handleSubmit , setValue} : For
       email: form.email,
       website: form.website,
       photo: form.photo,
+      occupation : form.occupation
     } as PersonalInfoProps['data'],
     name : "Personal Information"
     },

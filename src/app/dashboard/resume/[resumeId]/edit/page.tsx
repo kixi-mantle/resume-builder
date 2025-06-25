@@ -2,13 +2,13 @@
 
 
 import React, { use, useEffect, useRef, useState } from 'react'
-import Template_1 from '../../../../ResumeTemplate/resumes/Template-1'; 
-import FormWrapper from '../_components/FormWrapper'; 
+import Template_1 from '../../../../../ResumeTemplate/resumes/Template-1'; 
+import FormWrapper from '../../_components/FormWrapper'; 
 import { notFound } from 'next/navigation';
-import { getResume } from '../../../../action/resumeAction';
+import { getResume } from '../../../../../action/resumeAction';
 import { useForm } from 'react-hook-form';
-import { ResumeVlidation, Template_1_type } from '../../../../ResumeTemplate/resumeSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Template_1_type , ResumeVlidation} from '../../../../../ResumeTemplate/resumeSchema';
 
 
 const Page = ({params} : { params : Promise<{resumeId : string}>}) => {

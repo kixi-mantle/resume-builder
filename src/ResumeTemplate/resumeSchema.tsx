@@ -16,6 +16,7 @@ export type Experience  = {
 
 export type Template_1_type = {
   name: string;
+  occupation : string;
   address: string;
   phone: string;
   email: string;
@@ -30,10 +31,11 @@ export type Template_1_type = {
 }
 
 export const ResumeVlidation = z.object({
-            name : z.string(),
-            address : z.string(),
-            phone : z.string(),
-            email : z.string(),
+            name : z.string().min(1 , {message : "Field is required"}),
+            occupation : z.string().min(1 , {message : "Field is required"}),
+            address : z.string().min(1 , {message : "Field is required"}),
+            phone : z.string().min(1 , {message : "Field is required"}),
+            email : z.string().min(1 , {message : "Field is required"}),
             website : z.string(),
             photo : z.string().nullable(),
             summary : z.string(),
