@@ -3,9 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Experience, Template_1_type } from "../../../../ResumeTemplate/resumeSchema";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import { useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 import EditorCom from "./Editor";
+
 
 export type ResumeExperienceProps = {
   data:  Experience[],
@@ -30,46 +29,13 @@ const WorkExperience = ({ register, control , setValue  }: ResumeExperienceProps
     achievements: "",
   };
   
-       const editor =  useEditor({
-        extensions: [StarterKit.configure({
-                      bulletList: {
-                        HTMLAttributes: {
-                          class: 'list-disc pl-4',
-                        },
-                      },
-                      orderedList: {
-                        HTMLAttributes: {
-                          class: 'list-decimal pl-4',
-                        },
-                      },
-                    })],
        
-         editorProps : {
-        attributes : {
-          class: 'min-h-[200px] p-2 outline-none whitespace-pre-wrap'
-        },
-      },
-        
-        autofocus : true,
-        immediatelyRender:false
-    
-      });
-    
-      if (!editor) {
-        return (
-          <div className="flex flex-col w-full space-y-2">
-            <label className="text-sm font-semibold text-gray-600">Summary</label>
-            <div className="p-4 bg-gray-100 rounded-md text-gray-500">
-              Loading editor...
-            </div>
-          </div>
-        );
-      }
     
 
   return (
     <div className="flex relative flex-col space-y-4 w-full">
-      {fields.map((exp, index) => (
+      {fields.map((exp, index) =>{
+         return(
         <Card key={exp.id} className="border-gray-400 shadow-sm relative">
           <X 
             className="absolute right-2 top-2 hover:text-red-500 cursor-pointer text-sm" 
@@ -133,7 +99,7 @@ const WorkExperience = ({ register, control , setValue  }: ResumeExperienceProps
             {/* Achievements Field */}
             <div>
               <p className="font-medium mb-1">Achievement:</p>
-              <EditorCom editor={editor} initialContent={exp.achievements} onChange={(data)=>{
+              <EditorCom  initialContent={exp.achievements} onChange={(data)=>{
                 setValue(`experience.${index}.achievements` , data , {shouldValidate : true})
               }}/>
               {errors?.experience?.[index]?.achievements && (
@@ -144,7 +110,7 @@ const WorkExperience = ({ register, control , setValue  }: ResumeExperienceProps
             </div>
           </CardContent>
         </Card>
-      ))}
+      )})}
 
       <Button
         type="button"

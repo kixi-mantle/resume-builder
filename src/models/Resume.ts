@@ -23,6 +23,7 @@ const ResumeSchema : Schema<IResume> = new Schema({
     required : true,
   },
    name: { type: String,  trim: true },
+   occupation : {type : String , trim : true},
   address: { type: String ,trim: true },
   phone: { type: String, trim: true },
   email: { 

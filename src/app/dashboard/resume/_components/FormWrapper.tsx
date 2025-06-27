@@ -15,6 +15,8 @@ import Education, { ResumeEducationProps } from "./ResumeEducation"
 import { updateResume } from "../../../../action/resumeAction"
 import { toast } from "sonner"
 import AdditionalInfo, { InfoProps } from "./AdditionalInfo"
+import env from "../../../../server/data"
+import { redirect } from "next/navigation"
 
 
 type ComponentKey<T> = {
@@ -23,17 +25,20 @@ type ComponentKey<T> = {
   name : string
 };
 
+
+
 type FormWrapperProps = {
     form : Template_1_type ,
     register : UseFormRegister<Template_1_type>,
     control : Control<Template_1_type>,
     handleSubmit : UseFormHandleSubmit<Template_1_type>
-    setValue : UseFormSetValue<Template_1_type>
+    setValue : UseFormSetValue<Template_1_type>,
+    resumeId : string
 }
 
 
 
-const FormWrapper  =({form , register , control , handleSubmit , setValue} : FormWrapperProps) => {
+const FormWrapper  =({form , register , control , handleSubmit , setValue , resumeId} : FormWrapperProps) => {
 
 
   
@@ -80,6 +85,7 @@ const FormWrapper  =({form , register , control , handleSubmit , setValue} : For
    }
 
    type StepKey = keyof typeof components;
+    console.log(`\n${resumeId} this is it \n`);
 
    const [ispending , startTransition] = useTransition()
    const [curr, setCurr] = useState<StepKey>('1');
@@ -103,16 +109,61 @@ const FormWrapper  =({form , register , control , handleSubmit , setValue} : For
   }
   };
 
-  const handleSave =  (data : Template_1_type) => {
-      startTransition(async()=>{
-        
-        const res  = await updateResume({resumeId : 'ahdfkahdjfha', updateData : data})
-        if (res.error) toast.error('Error' , )
-      })
+  const handleSave = async (data: Template_1_type) => {
+  startTransition(async () => {
+    try {
+      let finalPhotoUrl = data.photo;
 
-      console.log(data);
-      
-  };
+      // Only process if it's not already a Cloudinary URL
+      if (data.photo && !data.photo.startsWith('https://res.cloudinary.com')) {
+        const response = await fetch(data.photo);
+        const blob = await response.blob();
+        const file = new File([blob], `photo-${Date.now()}`, {
+          type: blob.type || 'application/octet-stream'
+        });
+
+        const form = new FormData();
+        form.append('file', file);
+
+        const res = await fetch(`${env.NEXT_PUBLIC_BASE_URL}/api/upload-image`, {
+          method: 'POST',
+          body: form
+        });
+
+        const resData = await res.json();
+        if (resData.error) throw new Error(resData.error);
+        
+        finalPhotoUrl = resData.url;
+        setValue('photo', finalPhotoUrl); // Update form with new URL
+      }
+
+      // Now update with the final URL (either original Cloudinary or new upload)
+      const res = await updateResume({
+        resumeId,
+        updateData: { ...data, photo: finalPhotoUrl }
+      });
+
+      if (res.error) {
+        toast.error('Error', {
+          description: res.msg || 'Something went wrong'
+        });
+      }
+    } catch (error) {
+      toast.error('Upload failed', {
+        description: error instanceof Error ? error.message : 'Failed to process image'
+      });
+    }
+  });
+};
+
+  const handleFinish = async()=>{
+   
+   await handleSave(form)
+   redirect(`/dashboard/${resumeId}/preview`)
+
+  }
+
+  
   const handleLink = (i : StepKey)=>{
     const currIndex = stepOrder.indexOf(i);
     setCurr(stepOrder[currIndex])
@@ -123,7 +174,7 @@ const FormWrapper  =({form , register , control , handleSubmit , setValue} : For
 
 
    return (
-   <form  onSubmit={handleSubmit(handleSave)} className="w-full h-full flex flex-col border-2 border-gray-400 rounded-xl shadow-sm bg-white">
+   <form  onSubmit={handleSubmit(handleSave)} className="w-full h-full flex flex-col border-2 border-red-200 rounded-xl shadow-sm bg-white">
   {/* Top: Breadcrumb */}
   <div className="h-fit relative p-6 bg-white rounded-t-xl">
     <div className="absolute h-[2px] bg-gray-400 w-full bottom-0 left-0"></div>
@@ -198,13 +249,14 @@ type="submit"
 {/* Next or Finish Button */}
 {stepOrder.indexOf(curr) === totalSteps - 1 ? (
   <button
+  onClick={()=> handleFinish()}
     className="px-5 py-2 bg-green-500 text-white rounded-lg shadow-sm hover:bg-green-600 transition"  disabled={ispending}
   >
     Finish
   </button>
 ) : (
   <button
-    onClick={handleNext}
+    onClick={()=>handleNext()}
     className="px-5 py-2 bg-amber-400 text-white rounded-lg shadow-sm hover:bg-amber-500 transition"  disabled={ispending}
   >
     Next

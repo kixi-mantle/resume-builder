@@ -7,6 +7,7 @@ import { connectDB } from "../lib/mongodb";
 import Resume from "../models/Resume";
 import User from "../models/User";
 import { ObjectId } from "mongodb";
+import { Types } from "mongoose";
 
 export const createResume = async ({
   ownerId,
@@ -49,11 +50,17 @@ export const updateResume = async ({
 }) => {
   try {
      await connectDB()
-     await Resume.findByIdAndUpdate(
-      resumeId,
+     console.log(`\n${resumeId} this is it \n`);
+     if (!Types.ObjectId.isValid(resumeId)) {
+      return { error: true, msg: 'Invalid resume ID format' };
+    }
+    const resume =  await Resume.findByIdAndUpdate(
+      new Types.ObjectId(resumeId),
       { $set: updateData },
       { new: true, runValidators: true }
     ).lean();
+
+    console.log(resume)
 
     return {error : false};
 
@@ -102,7 +109,7 @@ export async function getResume(id: string ){
     
   try {
     await connectDB();
-    const  resume = await Resume.findById(id).lean()
+    const  resume = await Resume.findById(new Types.ObjectId(id)).lean()
     if(!resume) return null
 
  

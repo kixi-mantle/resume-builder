@@ -9,9 +9,12 @@ import { getResume } from '../../../../../action/resumeAction';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Template_1_type , ResumeVlidation} from '../../../../../ResumeTemplate/resumeSchema';
+import { useRouter } from 'next/navigation';
 
 
 const Page = ({params} : { params : Promise<{resumeId : string}>}) => {
+  const router = useRouter()
+
   const previewRef = useRef<HTMLDivElement>(null)
   const [height , setHeight] = useState(1123);
   const [width , setWidth] = useState(794);
@@ -39,9 +42,18 @@ const Page = ({params} : { params : Promise<{resumeId : string}>}) => {
   
   useEffect(()=>{
      //call for data and provide the data to the defaultvalues
+     
      const getResumeData = async()=>{
+       console.log(`\n${resumeId} this is it \n`);
+
       const resume = await getResume(resumeId)
-      if(!resume) notFound()
+     
+      
+     if (!resume) {
+      router.push('/not-found'); // Manual redirect
+      return;
+    }
+
         const {title , ...data} = resume
       setTitle(title)
        reset(data)
@@ -51,7 +63,7 @@ const Page = ({params} : { params : Promise<{resumeId : string}>}) => {
     getResumeData()
       
     
-  },[resumeId, reset])
+},[resumeId , reset , router])
   
   
   
@@ -91,13 +103,13 @@ const Page = ({params} : { params : Promise<{resumeId : string}>}) => {
        
             {/* form part */}
             <div  className='w-full lg:basis-[48%] h-full flex items-center '>
-              <FormWrapper form={form} register={register} control={control} handleSubmit={handleSubmit} setValue={setValue}/>
+              <FormWrapper form={form} register={register} control={control} handleSubmit={handleSubmit} setValue={setValue} resumeId={resumeId}/>
 
             </div>
 
             {/* form preview */}
 
-            <div className='basis-[48%] p-[1rem] h-full  my-8 bg-red-50 relative overflow-x-hidden overflow-y-auto scroll [&::-webkit-scrollbar]:hidden hidden lg:block'
+            <div className='basis-[48%] p-[1rem] h-full  my-8 bg-red-200 rounded-md relative overflow-x-hidden overflow-y-auto scroll [&::-webkit-scrollbar]:hidden hidden lg:block'
            
             ref={previewRef}>
                  

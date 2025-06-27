@@ -16,7 +16,7 @@ const TemplateRef = useRef<HTMLDivElement | null>(null);
 
 useEffect(()=>{
     setResumeRef(TemplateRef)
-},)
+},[TemplateRef , setResumeRef])
 
  
 useEffect(()=>{
