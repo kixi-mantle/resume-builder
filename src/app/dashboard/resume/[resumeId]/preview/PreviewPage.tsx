@@ -3,10 +3,9 @@
 
 
 import { useEffect, useState } from "react";
-import env from "../../../../../server/data";
 
 
-export default function PreviewPage  ({resumeId} : {resumeId : string}){
+export default function Preview  ({resumeId} : {resumeId : string}){
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -16,16 +15,30 @@ export default function PreviewPage  ({resumeId} : {resumeId : string}){
 
   
   const getpdf = async()=>{
-    const res = await fetch(`${env.NEXT_PUBLIC_BASE_URL}/resume/create-pdf?resumeId=${resumeId}`)
+   const res = await fetch(`/api/resume/create-pdf`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept' : 'application/pdf'
+  },
+  body: JSON.stringify({ resumeId })
+});
+    console.log(res)
+    const contentType = res.headers.get('Content-Type');
+    console.log('Response Content-Type:', contentType);
 
   if(!res.ok){
     setIsLoading(false)
-   setCreated(true)
+   setCreated(false)
      
   }
   
 
   const blob = await res.blob()
+  console.log('Blob type:', blob.type);
+  console.log(blob)
+
+ 
 
   const url = window.URL.createObjectURL(blob)
 
@@ -41,7 +54,6 @@ export default function PreviewPage  ({resumeId} : {resumeId : string}){
 
   return (
     <div className="max-w-4xl mx-auto p-6 flex flex-col items-center gap-6">
-
 
       {isLoading ? (
         <div className="flex flex-col items-center gap-3">

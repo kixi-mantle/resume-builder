@@ -1,5 +1,5 @@
+import Preview from "./PreviewPage";
 
-import PreviewPage from "./PreviewPage";
 
 
 
@@ -9,7 +9,7 @@ const Page = async({params} : { params : Promise<{resumeId : string}>}) => {
   
     return (
       <>
-      <PreviewPage resumeId={resumeId}/>
+      <Preview resumeId={resumeId}/>
       </>
     )
   
