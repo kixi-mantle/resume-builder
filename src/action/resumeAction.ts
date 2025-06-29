@@ -112,10 +112,24 @@ export async function getResume(id: string ){
     const  resume = await Resume.findById(new Types.ObjectId(id)).lean()
     if(!resume) return null
 
- 
-    return {
-      ...resume , _id : resume._id.toString() , owner_id : resume.owner_id.toString()
-    }
+     const result  = { ...resume ,
+       _id : resume._id.toString() , 
+       owner_id : resume.owner_id.toString() , 
+        education : resume.education.map((val)=>({
+          degree : val.degree , 
+          date : val.date,
+          institution : val.institution,
+
+        })),
+        experience : resume.experience.map((val)=>({
+          date : val.date , 
+          company : val.company,
+          position : val.position,
+          achievements : val.achievements
+
+        })),
+      }
+    return result
   } catch (error) {
    
     throw error 

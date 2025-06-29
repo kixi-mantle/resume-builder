@@ -159,7 +159,7 @@ const FormWrapper  =({form , register , control , handleSubmit , setValue , resu
   const handleFinish = async()=>{
    
    await handleSave(form)
-   redirect(`/dashboard/${resumeId}/preview`)
+   redirect(`/dashboard/resume/${resumeId}/preview`)
 
   }
 
