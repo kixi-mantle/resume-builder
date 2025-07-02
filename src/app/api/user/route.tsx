@@ -1,11 +1,11 @@
 // app/api/user/route.ts
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import User from '../../../models/User'
 import { connectDB } from '../../../lib/mongodb'
 import { verifyJWT } from '../../../server/safety'
 
-export async function GET() {
+export async function GET(req : NextRequest) {
   try {
     
 
@@ -23,8 +23,14 @@ export async function GET() {
 
     
     
-    const {userId} = await verifyJWT(sessionCookie)
-    const user = await User.findById(userId).select('name email _id').lean()
+    const data = await verifyJWT(sessionCookie)
+    if(!data){
+      const signInUrl = new URL('/signin', req.url)
+          signInUrl.searchParams.set('redirect', req.nextUrl.pathname)
+          return NextResponse.redirect(signInUrl)
+
+    }
+    const user = await User.findById(data.userId).select('name email _id').lean()
 
      if (!user) {
       return NextResponse.json(

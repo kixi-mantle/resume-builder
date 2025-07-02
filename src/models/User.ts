@@ -52,19 +52,13 @@ const UserSchema : Schema<IUser> = new Schema(
     ref : 'resume'
   },
   
-  
-  // Fields for Google OAuth
-  googleId: {
-    type: String,
-    unique: true,
-    sparse: true // Allows null for email/password users
-  },
-  googleProfile: {
-    accessToken: String,
-    refreshToken: String
+  authType : {
+    type : String , 
+    enum : ['email' , 'google'],
+    default : 'email'
+    
   },
   
-  // Fields for email verification
   isEmailVerified: { type: Boolean, default: false },
   emailVerifyToken: { type: String, select: false },
    emailVerifyExpires: {type : Date },

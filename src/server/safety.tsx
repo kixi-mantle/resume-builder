@@ -2,7 +2,7 @@
 
 import bcrypt from "bcrypt"
 import { randomBytes } from "crypto";
-import jwt, { JwtPayload } from 'jsonwebtoken'
+import {jwtVerify , SignJWT} from 'jose'
 import env from "./data";
 
 export async function passwordHash(password : string){
@@ -31,25 +31,45 @@ interface JWTPayload {
 }
 
 
-const getJwtSecret = (): jwt.Secret => {
+const getJwtSecret = (): string => {
   return env.JWT_SECRET
 }
 
 
 
-export async function createJWT(userId: string): Promise<string> {
+export async function createJWT(userId: string ): Promise<string> {
   
+const secret = new TextEncoder().encode(getJwtSecret());
 
-    const payload : JwtPayload = {
-        userId
-    }
+const alg = 'HS256';
 
+  return await new SignJWT({ userId })
+    .setProtectedHeader({ alg })
+    .setIssuedAt()
+    .setExpirationTime('1d')
+    .sign(secret);
+
+}
+
+
+export async function verifyJWT(token : string) : Promise< JWTPayload | null> {
+  try {
     
+    const secret = new TextEncoder().encode(getJwtSecret());
 
-  return jwt.sign(payload , getJwtSecret() )
-}
+    const {payload} = await jwtVerify(token , secret);
+    if(typeof payload.userId != 'string'){
+      return null
+    } 
 
+      return {
+        userId : payload.userId,
+        exp : payload.exp
+      }
+  } catch (error) {
+    console.error(error)
+    return null
+  }
 
-export async function verifyJWT(token : string) : Promise<JWTPayload> {
-    return jwt.verify(token , getJwtSecret()) as JWTPayload
-}
+   
+  }

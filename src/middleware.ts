@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { verifyJWT } from "./server/safety";
 
 
 
@@ -18,25 +19,38 @@ const ROUTE_CONFIG = {
     private : [
         '/dashboard'
     ],
-    authRoutes : ['/singin' , 'singup']
+    authRoutes : ['/signin' , 'singup']
 }
 
 
-export function middleware(request : NextRequest){
+export async function middleware(request : NextRequest){
 
     const {pathname} = request.nextUrl
-    const session = request.cookies.get('session');
-    const isVerified = !!session?.value
+    const token = request.cookies.get('session')?.value;
 
-     // Debug logging (remove in production)
+    
+    const isPrivate = ROUTE_CONFIG.private.some(path => pathname.startsWith(path))
+    
+
+    const isAuthRoute = ROUTE_CONFIG.authRoutes.includes(pathname)
+
+    if(!token && isPrivate ){
+         const signInUrl = new URL('/signin', request.url)
+    signInUrl.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(signInUrl)
+    }
+
+    const isVerified = token ? !!(await verifyJWT(token)) : false
+    if (!isVerified) request.cookies.set('session' , '')
+    
+    
+    
+
+    
  
 
 
-    const isPrivate = ROUTE_CONFIG.private.some(path => 
-        new RegExp(`^${path.replace('.* ', '(/.*)?')}$`).test(pathname)
-    )
-
-    const isAuthRoute = ROUTE_CONFIG.authRoutes.includes(pathname)
+   
 
      if (isAuthRoute && isVerified) {
     const redirectUrl = request.nextUrl.searchParams.get('redirect') || '/dashboard'

@@ -4,7 +4,7 @@ import { Types } from "mongoose"
 import { comparePassword, createJWT, getVerificationToken, verifyJWT } from "../server/safety"
 import { sendVerificationEmail } from "./helper/mailer"
 import { connectDB } from "../lib/mongodb"
-import User from "../models/User"
+import User, { IUser } from "../models/User"
 import { cookies } from "next/headers"
 
 
@@ -53,13 +53,9 @@ export const login = async ( {email  , password } : { email : string , password 
         if(!user.isEmailVerified ){
             if(!user.emailVerifyToken || (user.emailVerifyExpires && (Date.now() <= user.emailVerifyExpires.getTime())) )
             {
-                const token = await getVerificationToken()
-                user.emailVerifyToken = token
-                user.emailVerifyExpires = new Date(Date.now() + 10 * 60 * 1000)
-                await user.save()
-                console.log("sending verification link");
-                await sendVerificationEmail(user.email! , token , user._id.toString())
-                return {error : true , msg : 'verification'}
+                  await startVerification(user)
+                  return {error : true , msg : 'verification'}
+                
             }
 
         
@@ -72,7 +68,7 @@ export const login = async ( {email  , password } : { email : string , password 
 
           await  cookieStore.set('session' , token , {
                 httpOnly : true,
-                maxAge : 60 * 60 * 24 * 7 , 
+                maxAge : 60 * 60 * 24 , 
                 sameSite : 'lax',
                 path:'/'
                 
@@ -88,6 +84,15 @@ export const login = async ( {email  , password } : { email : string , password 
     }
 
 
+}
+
+export async function startVerification(user : IUser){
+                const token = await getVerificationToken()
+                user.emailVerifyToken = token
+                user.emailVerifyExpires = new Date(Date.now() + 10 * 60 * 1000)
+                await user.save()
+                await sendVerificationEmail(user.email! , token , user._id.toString())
+              
 }
 
 export const verifyEmail = async({token , id}:{token : string , id : string}) =>{
@@ -147,8 +152,12 @@ const sessionCookie = (await  cookies()).get('session')?.value
 
     
     
-    const {userId} = await verifyJWT(sessionCookie)
-    const user = await User.findById(userId).select('name email _id').lean()
+    const data= await verifyJWT(sessionCookie)
+    if (!data) {
+      return {error : true , msg : "Unauthorized access" , data : null}
+    }
+    
+    const user = await User.findById(data.userId).select('name email _id').lean()
 
      if (!user) {
       return {error : true , msg : "Unauthorized access" , data : null}
@@ -156,4 +165,10 @@ const sessionCookie = (await  cookies()).get('session')?.value
     }
 
    return {error : false , data : { id: user._id.toString(),name: user.name,email: user.email}}
+}
+
+export async function logout(){
+
+    const cookieStore = await cookies()
+    await cookieStore.delete({name : 'session' , path : '/'})
 }

@@ -2,58 +2,82 @@
 
 
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Template_body from "../../../../../ResumeTemplate/resumes/Template-1_body";
+import { Template_1_type } from "../../../../../ResumeTemplate/resumeSchema";
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 
-export default function Preview  ({resumeId} : {resumeId : string}){
+export default function Preview  ({resumeId , data} : {resumeId : string , data : Template_1_type}){
+  const pdfRef = useRef<HTMLDivElement | null>(null)
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
  useEffect(()=>{
 
+   
+   const generatePdf = async()=>{
 
+    try {
+       if(!pdfRef.current || !data) return
+
+        await new Promise(res => setTimeout(res, 3000)); 
+
+  const canvas = await html2canvas(pdfRef.current , {
+    scale : 2,
+    useCORS : true
+  });
+
+  const imgData = canvas.toDataURL("image/jpeg");
+
+  const pdf = new jsPDF({
+    orientation : "portrait",
+    unit : "pt",
+    format : "a4",
+  })
+
+  const pdfWidth = pdf.internal.pageSize.getWidth();
+  const pdfHeight = pdf.internal.pageSize.getHeight();
+
+  pdf.addImage(imgData, "JPEG", 0 ,0, pdfWidth , pdfHeight , undefined , "MEDIUM");
   
-  const getpdf = async()=>{
-   const res = await fetch(`/api/resume/create-pdf`, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept' : 'application/pdf'
-  },
-  body: JSON.stringify({ resumeId })
-});
-    console.log(res)
-    const contentType = res.headers.get('Content-Type');
-    console.log('Response Content-Type:', contentType);
 
-  if(!res.ok){
-    setIsLoading(false)
-   setCreated(false)
+  const pdfBlob = pdf.output("blob");
+  const url = URL.createObjectURL(pdfBlob);
+  
+
+  setPdfUrl(url)
+
+  setIsLoading(false)
+  setCreated(true)
+    } catch (error) {
+      console.error(error)
+      setIsLoading(false)
+      setCreated(false)  
+    }
      
-  }
-  
+    
 
-  const blob = await res.blob()
-  console.log('Blob type:', blob.type);
-  console.log(blob)
+}
 
- 
 
-  const url = window.URL.createObjectURL(blob)
-
-    setPdfUrl(url)
-    setIsLoading(false)
-    setCreated(true)
-  }
-  getpdf()
- },[resumeId])
+  generatePdf()
   
   
+ },[resumeId , data])
+  
+  
+
 
 
   return (
     <div className="max-w-4xl mx-auto p-6 flex flex-col items-center gap-6">
+
+      <div style={{width : '794px' , height : '1123px' }} ref={pdfRef}>
+        <Template_body data={data}/>
+      </div>
 
       {isLoading ? (
         <div className="flex flex-col items-center gap-3">

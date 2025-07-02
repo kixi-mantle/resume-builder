@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Template_body from "./Template-1_body";
 
 
-const Template_1 = ({ data , height , width } : { data : Template_1_type , height :  number | undefined , width: number |undefined }) => {
+const Template_1 = ({ data , width } : { data : Template_1_type ,  width: number |undefined }) => {
 
 
 const [scale , setScale] = useState(1);
@@ -21,7 +21,7 @@ const scaleValue = ((width || 794) -32)/ 794
   
     setScale(scaleValue);
 
-},[width , height])
+},[width ])
 
 
 

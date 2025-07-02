@@ -143,7 +143,7 @@ export const DashboardContent = ({user} :{ user : DashboardContentProps['user']}
                 </Button>
                 <Button 
                   className="bg-red-700 hover:bg-red-800 text-white"
-                  onClick={handleCreate}
+                  onClick={()=>handleCreate()}
                   disabled={!title.trim() || ispending }
                 >
                   Create

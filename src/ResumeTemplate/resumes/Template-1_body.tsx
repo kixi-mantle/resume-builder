@@ -1,80 +1,211 @@
-import Image from "next/image"
-import { Template_1_type } from "../resumeSchema"
+import Image from "next/image";
+import { Template_1_type } from "../resumeSchema";
 
-export default function Template_body({data} : { data : Template_1_type}){
-  return  ( <div className=" bg-white rounded-md w-full h-full" >
-  {/* Header Section */}
-  <header className="text-black p-5 pb-4 flex border-b border-gray-200">
-    <div className="flex justify-between items-center w-full">
-      <div className="mt-1">
-        <h1 className="text-3xl font-bold mb-1 text-purple-700">{data.name}</h1>
-        <p className="text-xl font-semibold italic text-purple-500 mb-3">{data.occupation}</p>
-        <p className="text-gray-700">{data.address}</p>
-        <p className="text-gray-700">{data.phone} | {data.email}</p>
-        <p className="text-gray-700">{data.website}</p>
-      </div>
-      <div className="w-[100px] h-[100px] rounded-full border-4 border-purple-700 overflow-hidden flex-shrink-0">
-        <Image 
-          src={data.photo || '/placeholder-profile.jpg'} 
-          alt="Profile"
-          width={100}
-          height={100}
-          className="object-cover"
-        />
-      </div>
+export default function Template_body({ data }: { data: Template_1_type }) {
+  return (
+    <div style={{ 
+      backgroundColor: "#ffffff", 
+      width: "100%", 
+      height: "100%", 
+      aspectRatio: "8.5/11", // Standard US letter ratio
+      padding: "1.5rem 3rem",
+      fontFamily: "'Helvetica', 'Arial', sans-serif",
+      fontSize: "11pt",
+      lineHeight: 1.4,
+      color: "#333333"
+    }}>
+      
+      {/* Header Section */}
+      <header style={{ 
+        display: "flex",
+        alignItems: "center",
+        marginBottom: "1.5rem",
+        paddingBottom: "1rem",
+      }}>
+        {data.photo && (
+          <div style={{ 
+            width: "100px", 
+            height: "100px", 
+            borderRadius: "50%", 
+            overflow: "hidden",
+            marginRight: "1.5rem",
+            border: "3px solid #f0f0f0"
+          }}>
+            <Image
+              src={data.photo}
+              alt="Profile"
+              width={100}
+              height={100}
+              style={{ objectFit: "cover", width: "100%", height: "100%" }}
+            />
+          </div>
+        )}
+        
+        <div>
+          <h1 style={{ 
+            fontSize: "22pt", 
+            fontWeight: 600, 
+            color: "#2c3e50",
+            margin: "0 0 0"
+          }}>
+            {data.name}
+          </h1>
+          <h2 style={{ 
+            fontSize: "16pt", 
+            fontWeight: 600, 
+            color: "#555555",
+            margin: "0",
+            fontStyle: "italic"
+          }}>
+            {data.occupation}
+          </h2>
+          <div style={{ color: "#555555", fontSize: "10pt" }}>
+            <p style={{ margin: "0.1rem 0" }}>{data.address}</p>
+            <p style={{ margin: "0.1rem 0" }}>{data.phone} | {data.email}</p>
+            {data.website && <p style={{ margin: "0.1rem 0" }}>{data.website}</p>}
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main>
+        {data.summary && (
+          <section style={{ marginBottom: "1.5rem" }}>
+            <h2 style={{ 
+              fontSize: "14pt", 
+              fontWeight: 600, 
+              color: "#2c3e50",
+              borderBottom: "1px solid #e0e0e0",
+              paddingBottom: "0.25rem",
+              marginBottom: "0.75rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.5px"
+            }}>
+              Summary
+            </h2>
+            <div style={{ color: "#555555" }} dangerouslySetInnerHTML={{ __html: data.summary }} />
+          </section>
+        )}
+
+        {data.experience.length > 0 && (
+          <section style={{ marginBottom: "1.5rem" }}>
+            <h2 style={{ 
+              fontSize: "14pt", 
+              fontWeight: 600, 
+              color: "#2c3e50",
+              borderBottom: "1px solid #e0e0e0",
+              paddingBottom: "0.25rem",
+              marginBottom: "0.75rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.5px"
+            }}>
+              Professional Experience
+            </h2>
+            {data.experience.map((exp, index) => (
+              <div key={index} style={{ marginBottom: "1rem" }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <h3 style={{ 
+                    fontSize: "12pt", 
+                    fontWeight: 600, 
+                    color: "#2c3e50",
+                    margin: "0 0 0.1rem 0"
+                  }}>
+                    {exp.company}
+                  </h3>
+                  <span style={{ 
+                    fontSize: "10pt", 
+                    color: "#7f8c8d",
+                    fontWeight: 500
+                  }}>
+                    {exp.date}
+                  </span>
+                </div>
+                <p style={{ 
+                  fontSize: "11pt", 
+                  fontWeight: 500, 
+                  color: "#34495e",
+                  fontStyle: "italic",
+                  margin: "0 0 0.5rem 0"
+                }}>
+                  {exp.position}
+                </p>
+                <div style={{ 
+                  color: "#555555",
+                  fontSize: "10.5pt",
+                  paddingLeft: "1rem"
+                }} dangerouslySetInnerHTML={{ __html: exp.achievements }} />
+              </div>
+            ))}
+          </section>
+        )}
+
+        {data.education.length > 0 && (
+          <section style={{ marginBottom: "1.5rem" }}>
+            <h2 style={{ 
+              fontSize: "14pt", 
+              fontWeight: 600, 
+              color: "#2c3e50",
+              borderBottom: "1px solid #e0e0e0",
+              paddingBottom: "0.25rem",
+              marginBottom: "0.75rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.5px"
+            }}>
+              Education
+            </h2>
+            {data.education.map((edu, index) => (
+              <div key={index} style={{ marginBottom: "0.75rem" }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <h3 style={{ 
+                    fontSize: "12pt", 
+                    fontWeight: 600, 
+                    color: "#2c3e50",
+                    margin: "0 0 0.1rem 0"
+                  }}>
+                    {edu.institution}
+                  </h3>
+                  <span style={{ 
+                    fontSize: "10pt", 
+                    color: "#7f8c8d",
+                    fontWeight: 500
+                  }}>
+                    {edu.date}
+                  </span>
+                </div>
+                <p style={{ 
+                  fontSize: "11pt", 
+                  color: "#34495e",
+                  margin: "0",
+                  fontStyle: "italic"
+                }}>
+                  {edu.degree}
+                </p>
+              </div>
+            ))}
+          </section>
+        )}
+
+        {data.additionalInfo && (
+          <section>
+            <h2 style={{ 
+              fontSize: "14pt", 
+              fontWeight: 600, 
+              color: "#2c3e50",
+              borderBottom: "1px solid #e0e0e0",
+              paddingBottom: "0.25rem",
+              marginBottom: "0.75rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.5px"
+            }}>
+              Additional Information
+            </h2>
+            <div style={{ 
+              color: "#555555",
+              fontSize: "10.5pt"
+            }} dangerouslySetInnerHTML={{ __html: data.additionalInfo }} />
+          </section>
+        )}
+      </main>
     </div>
-  </header>
-
-  {/* Main Content */}
-  <main className="p-6 ">
-    {/* Summary */}
-    {data.summary && (
-      <section className="mb-8">
-        <h2 className="text-xl font-bold text-purple-700 border-b-2 border-purple-200 pb-1 mb-3">SUMMARY</h2>
-        <div className="text-gray-700" dangerouslySetInnerHTML={{ __html: data.summary }}></div>
-      </section>
-    )}
-
-    {/* Experience */}
-    {data.experience.length > 0 && (
-      <section className="mb-8">
-        <h2 className="text-xl font-bold text-purple-700 border-b-2 border-purple-200 pb-1 mb-3">EXPERIENCE</h2>
-        {data.experience.map((exp, index) => (
-          <div key={index} className="mb-6">
-            <div className="flex justify-between items-start">
-              <h3 className="text-lg font-semibold text-gray-800">{exp.position}</h3>
-              <span className="text-sm text-gray-500">{exp.date}</span>
-            </div>
-            <h4 className="text-md font-medium text-gray-600 mb-2">{exp.company}</h4>
-            <div className="space-y-1 text-gray-700" dangerouslySetInnerHTML={{ __html: exp.achievements }} />
-          </div>
-        ))}
-      </section>
-    )}
-
-    {/* Education */}
-    {data.education.length > 0 && (
-      <section className="mb-8">
-        <h2 className="text-xl font-bold text-purple-700 border-b-2 border-purple-200 pb-1 mb-3">EDUCATION</h2>
-        {data.education.map((edu, index) => (
-          <div key={index} className="mb-4">
-            <div className="flex justify-between">
-              <h3 className="font-semibold text-gray-800">{edu.degree}</h3>
-              <span className="text-sm text-gray-500">{edu.date}</span>
-            </div>
-            <p className="text-gray-600">{edu.institution}</p>
-          </div>
-        ))}
-      </section>
-    )}
-
-    {/* Additional Info */}
-    {data.additionalInfo && (
-      <section>
-        <h2 className="text-xl font-bold text-purple-700 border-b-2 border-purple-200 pb-1 mb-3">ADDITIONAL INFORMATION</h2>
-        <div dangerouslySetInnerHTML={{ __html: data.additionalInfo }} />
-      </section>
-    )}
-  </main>
-</div>)
+  );
 }

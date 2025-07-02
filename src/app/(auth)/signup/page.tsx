@@ -121,7 +121,9 @@ const Page = () => {
 
         <span className="block w-full text-center my-3 text-accent font-semibold">or</span>
         <div className="w-full flex justify-center">
-             <button className="rounded-full px-3 py-2 border-2 border-amber-600 text-sm font-semibold cursor-pointer hover:scale-[1.03] transition-all hover:accent-bg "> Login in with Google</button>
+             <button className="rounded-full px-3 py-2 border-2 border-amber-600 text-sm font-semibold cursor-pointer hover:scale-[1.03] transition-all hover:accent-bg " onClick={async()=>{
+               window.location.href = '/api/auth/google';
+             }}> Login in with Google</button>
         </div>
         
         {
