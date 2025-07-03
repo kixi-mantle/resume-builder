@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Template_1_type } from "../resumeSchema";
 
 export default function Template_body({ data }: { data: Template_1_type }) {
@@ -31,7 +30,7 @@ export default function Template_body({ data }: { data: Template_1_type }) {
             marginRight: "1.5rem",
             border: "3px solid #f0f0f0"
           }}>
-            <Image
+            <img
               src={data.photo}
               alt="Profile"
               width={100}
@@ -70,7 +69,7 @@ export default function Template_body({ data }: { data: Template_1_type }) {
       {/* Main Content */}
       <main>
         {data.summary && (
-          <section style={{ marginBottom: "1.5rem" }}>
+          <section style={{ paddingBottom: "1.5rem" }}>
             <h2 style={{ 
               fontSize: "14pt", 
               fontWeight: 600, 
@@ -88,7 +87,7 @@ export default function Template_body({ data }: { data: Template_1_type }) {
         )}
 
         {data.experience.length > 0 && (
-          <section style={{ marginBottom: "1.5rem" }}>
+          <section style={{ paddingBottom: "1.5rem" }}>
             <h2 style={{ 
               fontSize: "14pt", 
               fontWeight: 600, 
@@ -140,7 +139,7 @@ export default function Template_body({ data }: { data: Template_1_type }) {
         )}
 
         {data.education.length > 0 && (
-          <section style={{ marginBottom: "1.5rem" }}>
+          <section style={{ paddingBottom: "1.5rem" }}>
             <h2 style={{ 
               fontSize: "14pt", 
               fontWeight: 600, 

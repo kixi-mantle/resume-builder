@@ -73,57 +73,52 @@ if (!resumeId) return notFound()
 const form : Template_1_type = watch();
 
 return (
-  <div className="h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] px-[2rem] py-[4rem] relative flex justify-between items-center">
-    {/* form part */}
-    <div className='w-full lg:basis-[48%] h-full flex items-center '>
-      <FormWrapper 
-        form={form} 
-        register={register} 
-        control={control} 
-        handleSubmit={handleSubmit} 
-        setValue={setValue} 
-        resumeId={resumeId}
-      />
-    </div>
-
-    {/* Desktop preview */}
-    <div className='w-full lg:basis-[48%] p-[1rem] h-full my-8 bg-red-200 rounded-md relative overflow-x-hidden overflow-y-auto scroll [&::-webkit-scrollbar]:hidden hidden lg:block'
-      ref={previewRef}>
-      <Template_1 
-        data={form} 
-      
-        width={width} 
-      />
-    </div>
-
-    {/* Mobile preview button */}
-    <button 
-      onClick={() => setShowPreview(true)}
-      className="fixed bottom-6 right-6 lg:hidden flex items-center px-4 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-colors z-50"
-    >
-      <File className='mr-2'/>
-      Preview
-    </button>
-
-    {/* Mobile preview modal */}
-    <Dialog open={showPreview} onOpenChange={setShowPreview} >
-      <DialogContent className="w-[90vw] h-[90vh] lg:hidden">
-        
- 
-       
-        <div className="w-full h-full p-[1rem] relative overflow-y-auto overflow-x-hidden scroll [&::-webkit-scrollbar]:hidden" >
-          
-            <Template_1 
-              data={form} 
-            
-              width={modalWidth} 
-            />
-
-          
-        </div>
-      </DialogContent>
-    </Dialog>
+ <div className="h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] px-[2rem] py-[4rem] relative flex justify-between items-center bg-gray-50">
+  {/* form part */}
+  <div className='w-full lg:basis-[48%] h-full flex items-center'>
+    <FormWrapper 
+      form={form} 
+      register={register} 
+      control={control} 
+      handleSubmit={handleSubmit} 
+      setValue={setValue} 
+      resumeId={resumeId}
+    />
   </div>
+
+  {/* Desktop preview */}
+  <div className='w-full lg:basis-[48%] p-[1rem] h-full my-8 bg-white rounded-md relative overflow-x-hidden overflow-y-auto scroll [&::-webkit-scrollbar]:hidden hidden lg:block border border-gray-200 shadow-sm'
+    ref={previewRef}>
+    <Template_1 
+      data={form} 
+      width={width} 
+    />
+  </div>
+
+  {/* Mobile preview button - now with red theme */}
+  <button 
+    onClick={() => setShowPreview(true)}
+    className="fixed bottom-6 right-[50%] translate-x-[50%] lg:hidden flex items-center px-4 py-3 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 transition-colors z-50"
+  >
+    <File className='mr-2'/>
+    Preview
+  </button>
+
+  {/* Mobile preview modal */}
+  <Dialog open={showPreview} onOpenChange={setShowPreview}>
+    <DialogContent className="w-[90vw] h-[90vh] max-w-[800px]">
+      <DialogTitle className='text-red-600 text-xl font-semibold text-center mb-4'>
+        Resume Preview
+      </DialogTitle>
+      <div className="w-full h-full p-[1rem] bg-white rounded-md relative overflow-y-auto overflow-x-hidden scroll [&::-webkit-scrollbar]:hidden border border-gray-200">
+        <Template_1 
+          data={form} 
+          width={modalWidth} 
+        />
+      </div>
+    </DialogContent>
+  </Dialog>
+</div>
 )
 }
 

@@ -19,7 +19,7 @@ const ROUTE_CONFIG = {
     private : [
         '/dashboard'
     ],
-    authRoutes : ['/signin' , 'singup']
+    authRoutes : ['/signin' , 'signup']
 }
 
 
@@ -33,34 +33,26 @@ export async function middleware(request : NextRequest){
     
 
     const isAuthRoute = ROUTE_CONFIG.authRoutes.includes(pathname)
-
-    if(!token && isPrivate ){
-         const signInUrl = new URL('/signin', request.url)
-    signInUrl.searchParams.set('redirect', pathname)
-    return NextResponse.redirect(signInUrl)
-    }
-
     const isVerified = token ? !!(await verifyJWT(token)) : false
-    if (!isVerified) request.cookies.set('session' , '')
     
     
-    
-
-    
- 
-
-
-   
-
-     if (isAuthRoute && isVerified) {
-    const redirectUrl = request.nextUrl.searchParams.get('redirect') || '/dashboard'
-    return NextResponse.redirect(new URL(redirectUrl, request.url))
+if (token && !isVerified) {
+    const response = NextResponse.redirect(new URL('/signin', request.url))
+    response.cookies.delete('session')
+    return response
   }
 
-   if (isPrivate && !isVerified) {
+  // 2. Handle private routes without token
+  if (isPrivate && !isVerified) {
     const signInUrl = new URL('/signin', request.url)
     signInUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(signInUrl)
+  }
+
+  // 3. Prevent authenticated users from accessing auth routes
+  if (isAuthRoute && isVerified) {
+    const redirectUrl = request.nextUrl.searchParams.get('redirect') || '/dashboard'
+    return NextResponse.redirect(new URL(redirectUrl, request.url))
   }
 
   return NextResponse.next()

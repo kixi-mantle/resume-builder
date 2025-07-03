@@ -1,7 +1,8 @@
 "use server"
 
 import { Types } from "mongoose"
-import { comparePassword, createJWT, getVerificationToken, verifyJWT } from "../server/safety"
+import { comparePassword, getVerificationToken } from "../server/crypto"
+import {  createJWT, verifyJWT } from "../server/safety"
 import { sendVerificationEmail } from "./helper/mailer"
 import { connectDB } from "../lib/mongodb"
 import User, { IUser } from "../models/User"

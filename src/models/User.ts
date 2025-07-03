@@ -1,5 +1,5 @@
 import mongoose, { Document, Model, Schema, Types } from "mongoose";
-import { comparePassword, passwordHash } from "../server/safety";
+import { comparePassword, passwordHash } from "../server/crypto";
 
 
 

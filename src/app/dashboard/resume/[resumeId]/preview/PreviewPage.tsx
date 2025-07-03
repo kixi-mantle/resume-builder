@@ -1,125 +1,149 @@
 "use client"
 
-
-
 import { useEffect, useRef, useState } from "react";
 import Template_body from "../../../../../ResumeTemplate/resumes/Template-1_body";
 import { Template_1_type } from "../../../../../ResumeTemplate/resumeSchema";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal, Download, AlertCircle } from "lucide-react";
 
-
-export default function Preview  ({resumeId , data} : {resumeId : string , data : Template_1_type}){
-  const pdfRef = useRef<HTMLDivElement | null>(null)
+export default function Preview({ resumeId, data }: { resumeId: string, data: Template_1_type }) {
+  const pdfRef = useRef<HTMLDivElement | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  
- useEffect(()=>{
+  const [progress, setProgress] = useState(0);
 
-   
-   const generatePdf = async()=>{
-
+  useEffect(() => {
+  const generatePdf = async () => {
     try {
-       if(!pdfRef.current || !data) return
+      if (!data) return;
+      
+      // Simulate progress for better UX
+      const interval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(interval);
+            return prev;
+          }
+          return prev + 10;
+        });
+      }, 300);
 
-        await new Promise(res => setTimeout(res, 3000)); 
+      // Send request to your API endpoint
+      const response = await fetch('/api/resume/create-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          resumeId: resumeId,
+          // Include any other necessary data
+        }),
+      });
 
-  const canvas = await html2canvas(pdfRef.current , {
-    scale : 2,
-    useCORS : true
-  });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-  const imgData = canvas.toDataURL("image/jpeg");
-
-  const pdf = new jsPDF({
-    orientation : "portrait",
-    unit : "pt",
-    format : "a4",
-  })
-
-  const pdfWidth = pdf.internal.pageSize.getWidth();
-  const pdfHeight = pdf.internal.pageSize.getHeight();
-
-  pdf.addImage(imgData, "JPEG", 0 ,0, pdfWidth , pdfHeight , undefined , "MEDIUM");
-  
-
-  const pdfBlob = pdf.output("blob");
-  const url = URL.createObjectURL(pdfBlob);
-  
-
-  setPdfUrl(url)
-
-  setIsLoading(false)
-  setCreated(true)
+      // Check if response is PDF (success case)
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/pdf')) {
+        const pdfBlob = await response.blob();
+        const url = URL.createObjectURL(pdfBlob);
+        setPdfUrl(url);
+        setProgress(100);
+        setIsLoading(false);
+        setCreated(true);
+      } else {
+        // Handle case where response isn't PDF
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Invalid response format');
+      }
     } catch (error) {
-      console.error(error)
-      setIsLoading(false)
-      setCreated(false)  
+      console.error('PDF generation failed:', error);
+      setIsLoading(false);
+      setCreated(false);
+      // Optionally set an error state here
+    } 
+  };
+
+  generatePdf();
+
+  // Cleanup function
+  return () => {
+    if (pdfUrl) {
+      URL.revokeObjectURL(pdfUrl); // Free memory when component unmounts
     }
-     
-    
-
-}
-
-
-  generatePdf()
-  
-  
- },[resumeId , data])
-  
-  
-
-
+  };
+}, [resumeId, data , pdfUrl]);
 
   return (
-    <div className="max-w-4xl mx-auto p-6 flex flex-col items-center gap-6">
+    <div className="max-w-4xl mx-auto p-6 flex flex-col items-center gap-8">
+      <Card className="w-full p-6 flex flex-col items-center gap-6">
 
-      <div style={{width : '794px' , height : '1123px' }} ref={pdfRef}>
-        <Template_body data={data}/>
-      </div>
-
-      {isLoading ? (
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-red-600 font-medium">Creating your resume PDF...</p>
-        </div>
-      ) : created ? (
-        <>
-          <p className="text-green-700 text-lg font-semibold">
-            Your resume has been created!
-          </p>
-
-          <button
-            onClick={() => {
-              if (pdfUrl) {
-                const link = document.createElement("a");
-                link.href = pdfUrl;
-                link.download = "resume.pdf";
-                link.click();
-              }
-            }}
-            className="px-5 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-          >
-            Download PDF
-          </button>
-
-          {pdfUrl && (
-            <div className="w-full border rounded shadow-md mt-4">
-              <iframe
-                src={pdfUrl}
-                title="Resume PDF Preview"
-                className="w-full h-[600px]"
-              />
+         {isLoading ? (
+          <div className="w-full max-w-md flex flex-col items-center gap-4">
+            <Progress value={progress} className="h-2 w-full" />
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-lg font-medium text-gray-700">
+                {progress < 50 ? "Processing your resume..." : "Finalizing PDF..."}
+              </span>
             </div>
-          )}
-        </>
-      ) : (
-        <div className="text-red-600 font-medium">
-          Failed to generate PDF. Please try again.
+          </div>
+        ) : created ? (
+          <div className="w-full flex flex-col items-center gap-6">
+            <Alert className="w-full max-w-md border-green-200 bg-green-50">
+              <Terminal className="h-4 w-4 text-green-600" />
+              <AlertTitle className="text-green-600">Success!</AlertTitle>
+              <AlertDescription>
+                Your resume PDF is ready to download.
+              </AlertDescription>
+            </Alert>
+
+            <div className="flex gap-4">
+              <Button 
+                onClick={() => {
+                  if (pdfUrl) {
+                    const link = document.createElement("a");
+                    link.href = pdfUrl;
+                    link.download = `${data.name || 'my'}-resume.pdf`;
+                    link.click();
+                  }
+                }}
+                className="bg-red-600 hover:bg-red-700 gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Download PDF
+              </Button>
+
+            </div>
+
+          </div>
+        ) : (
+          <Alert variant="destructive" className="w-full max-w-md">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>
+              Failed to generate PDF. Please try again.
+            </AlertDescription>
+          </Alert>
+        )}
+        <div 
+          className="border rounded-md shadow-sm overflow-hidden"
+          style={{ width: '794px', height: '1123px' }} 
+          ref={pdfRef}
+        >
+          <Template_body data={data} />
         </div>
-      )}
+
+       
+      </Card>
     </div>
   );
 }
-

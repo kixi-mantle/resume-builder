@@ -8,28 +8,28 @@ import Template_body from '../../../src/ResumeTemplate/resumes/Template-1_body'
 // PDF Generation Utility
 const generatePDF = async (html: string) => {
   const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'] ,
-    devtools : false
-  })
+    headless: true, // Use new Headless mode
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    devtools: false
+  });
 
   try {
-    const page = await browser.newPage()
+    const page = await browser.newPage();
     
     // Set viewport to match A4 dimensions
     await page.setViewport({
-      width: 1240,  // ~A4 width at 96dpi
-      height: 1754, // ~A4 height at 96dpi
-      deviceScaleFactor: 2 // Retina quality
-    })
+      width: 1240,
+      height: 1754,
+      deviceScaleFactor: 2
+    });
 
-    // Enable request interception to monitor resource loading
-    await page.setRequestInterception(true)
+    // Enable request interception
+    await page.setRequestInterception(true);
     page.on('request', (request) => {
-      request.continue()
-    })
+      request.continue();
+    });
 
-    // Inject HTML with Tailwind
+    // Inject HTML with proper Next.js image handling
     await page.setContent(`
       <!DOCTYPE html>
       <html>
@@ -38,10 +38,16 @@ const generatePDF = async (html: string) => {
           <script src="https://cdn.tailwindcss.com"></script>
           <style>
             @page { size: A4; margin: 0; }
-            body { 
-              margin: 0; 
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
+            body { margin: 0; }
+            .next-image-wrapper > span {
+              position: static !important;
+            }
+            img {
+              opacity: 0;
+              transition: opacity 0.5s;
+            }
+            img.loaded {
+              opacity: 1;
             }
           </style>
         </head>
@@ -52,36 +58,41 @@ const generatePDF = async (html: string) => {
     `, {
       waitUntil: 'networkidle0',
       timeout: 30000
-    })
+    });
 
-    // Wait for all images to load (with proper TypeScript typing)
-    await page.evaluate(async () => {
+   
+    await page.evaluate(async()=>{
       const images = Array.from(document.querySelectorAll('img'))
-      await Promise.all(images.map(img => {
-        const image = img as HTMLImageElement
-        if (image.complete) return
-        return new Promise((resolve) => {
-          image.addEventListener('load', resolve)
-          image.addEventListener('error', resolve)
-        })
-      }))
+      await Promise.all(
+    images.map((img) => {
+      if (img.complete && img.naturalWidth !== 0) {
+        // Image already loaded
+        return Promise.resolve();
+      } else {
+        // Return a promise that resolves when the image loads or rejects on error
+        return new Promise((resolve, reject) => {
+          img.addEventListener('load', resolve);
+          img.addEventListener('error', reject);
+        });
+      }
+    })
+  );
     })
 
-    // Generate PDF with proper settings
+    // Generate PDF
     const buffer = await page.pdf({
       format: 'A4',
-      printBackground: true, // Essential for colors
+      printBackground: true,
       margin: { top: '0mm', right: '0mm', bottom: '0mm', left: '0mm' },
       preferCSSPageSize: true,
       timeout: 30000
-    })
+    });
 
-    return buffer
+    return buffer;
   } finally {
-    await browser.close()
+    await browser.close();
   }
-}
-
+};
 // Error Handler
 const handleError = async (res: NextApiResponse, status: number, message: string): Promise<void> => {
   const errorHtml = `
@@ -182,3 +193,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return handleError(res, 500, message)
   }
 }
+
