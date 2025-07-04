@@ -38,7 +38,7 @@ try {
         ).end(buffer)
     })
     
-      console.log(result)
+      
 
     return NextResponse.json({url : result.secure_url});
    }catch(error){

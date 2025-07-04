@@ -31,9 +31,8 @@ import { Label } from '@/components/ui/label';
 import { MoreVertical, FilePlus2 } from 'lucide-react'
 import Link from 'next/link'
 import { Template_1_type } from '../../ResumeTemplate/resumeSchema'
-import { createResume, getResumeFromUser } from '../../action/resumeAction'
+import { createResume, deleteResume, getResumeFromUser } from '../../action/resumeAction'
 import { toast } from 'sonner'
-import { useUpdateStore } from '../../store/data'
 
 export type DashboardContentProps = {
   resumes : {id : string , 
@@ -50,7 +49,7 @@ export const DashboardContent = ({user} :{ user : DashboardContentProps['user']}
   const [isOpen, setIsOpen] = useState(false);
   const [ispending , startTransition] = useTransition()
   const [resumes , setResumes] = useState<DashboardContentProps['resumes'] | null>(null)
-  const {resumePartialUpdate , setResumePartialUpdate} = useUpdateStore()
+  const [isdelete , setIsdelete] = useState<string>('')
 
 
   useEffect(()=>{
@@ -63,6 +62,13 @@ export const DashboardContent = ({user} :{ user : DashboardContentProps['user']}
   } , [user])
 
   const handleCreate = async()=>{
+
+    if(resumes && resumes.length >= 2){
+      toast.error("Error",{
+        description : "You cannot create more than 1 resume please delete the current resume"
+      })
+      return
+    }
      const defaultvalues : Template_1_type = {
       
            name: '',
@@ -101,6 +107,22 @@ export const DashboardContent = ({user} :{ user : DashboardContentProps['user']}
           
         })
     
+  }
+
+  const handleDelete = async(id : string)=>{
+    setIsdelete(id)
+    const res = await deleteResume(id);
+    if(res.error){
+      toast.error("Error",{
+        description : "Something wrong"
+      })
+    }
+
+    setIsdelete('')
+    setResumes(prev => {
+      if(!prev) return null
+      return prev.filter(val=> val.id != id)})
+     
   }
     return (
     <div className="p-6 bg-red-50 min-h-screen">
@@ -191,23 +213,27 @@ export const DashboardContent = ({user} :{ user : DashboardContentProps['user']}
                       </TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
+                          <DropdownMenuTrigger asChild onClick={(e)=> e.stopPropagation()}>
                             <Button variant="ghost" className="h-8 w-8 p-0 hover:text-white">
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="bg-white">
-                            <DropdownMenuItem className="cursor-pointer hover:bg-red-400 ">
-                              <Link href={'/'} className='w-full h-full   hover:text-white'>View</Link>
+                            <DropdownMenuItem className="cursor-pointer m-0 p-0">
+                              <Link href={'/'} className='w-full h-full hover:text-white hover:bg-red-400  p-2 rounded-md'>View</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer hover:bg-red-400 ">
-                               <Link href={`dashboard/resume/${resume.id}/edit`} className='w-full h-full   hover:text-white'>Edit</Link>
+                            <DropdownMenuItem className="cursor-pointer  m-0 p-0 ">
+                               <Link href={`dashboard/resume/${resume.id}/edit`} className='w-full h-full p-2 rounded-md  hover:bg-red-400  hover:text-white '>Edit</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer hover:bg-red-400 " asChild>
-                              <div className='w-full h-full hover:text-white'>Download</div>
+                            <DropdownMenuItem className="cursor-pointer  m-0 p-0 " >
+                              <div className='w-full h-full hover:bg-red-400  hover:text-white p-2 rounded-md'>Download</div>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer text-red-600 hover:bg-red-400 " asChild>
-                             <div className='w-full h-full hover:text-white'>delete</div>
+                            <DropdownMenuItem className="cursor-pointer  m-0 p-0  " >
+                             <div className='w-full h-full text-red-600 hover:text-white hover:bg-red-400 p-2 rounded-md ' onClick={()=>handleDelete(resume.id)}>
+                              {isdelete == resume.id ? (
+                                <div className='w-6 h-6 rounded-full border-[1.5px] border-white border-t-transparent animate-spin'></div>
+                              ) : 'delete'}
+                              delete</div>
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>

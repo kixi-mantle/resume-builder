@@ -39,16 +39,7 @@ const generatePDF = async (html: string) => {
           <style>
             @page { size: A4; margin: 0; }
             body { margin: 0; }
-            .next-image-wrapper > span {
-              position: static !important;
-            }
-            img {
-              opacity: 0;
-              transition: opacity 0.5s;
-            }
-            img.loaded {
-              opacity: 1;
-            }
+            
           </style>
         </head>
         <body>
@@ -59,6 +50,8 @@ const generatePDF = async (html: string) => {
       waitUntil: 'networkidle0',
       timeout: 30000
     });
+
+    await page.waitForSelector('img')
 
    
     await page.evaluate(async()=>{
@@ -79,6 +72,7 @@ const generatePDF = async (html: string) => {
   );
     })
 
+
     // Generate PDF
     const buffer = await page.pdf({
       format: 'A4',
@@ -90,7 +84,7 @@ const generatePDF = async (html: string) => {
 
     return buffer;
   } finally {
-    await browser.close();
+   
   }
 };
 // Error Handler

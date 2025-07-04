@@ -9,7 +9,8 @@ const TipTapEditor = dynamic(
     ssr: false,
     loading: () => (
       <div className="min-h-[200px] border rounded-lg bg-gray-50 animate-pulse" />
-    )
+    ),
+    
   }
 );
 
@@ -35,6 +36,7 @@ export default function EditorCom({ initialContent, onChange }: EditorProps) {
     onUpdate: ({ editor }) => {
       onChange?.(editor.getHTML());
     },
+    immediatelyRender : false
   });
 
   if (!editor) {

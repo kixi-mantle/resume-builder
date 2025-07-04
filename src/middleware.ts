@@ -28,6 +28,12 @@ export async function middleware(request : NextRequest){
     const {pathname} = request.nextUrl
     const token = request.cookies.get('session')?.value;
 
+    if(!token){
+       const response = NextResponse.redirect(new URL('/signin', request.url))
+    response.cookies.delete('session')
+    return response
+    }
+
     
     const isPrivate = ROUTE_CONFIG.private.some(path => pathname.startsWith(path))
     

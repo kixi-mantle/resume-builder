@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Template_body from "../../../../../ResumeTemplate/resumes/Template-1_body";
 import { Template_1_type } from "../../../../../ResumeTemplate/resumeSchema";
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -74,13 +73,19 @@ export default function Preview({ resumeId, data }: { resumeId: string, data: Te
 
   generatePdf();
 
-  // Cleanup function
-  return () => {
+  
+  
+}, [resumeId, data ]);
+
+useEffect(()=>{
+
+  //cleanup function
+return () => {
     if (pdfUrl) {
       URL.revokeObjectURL(pdfUrl); // Free memory when component unmounts
     }
   };
-}, [resumeId, data , pdfUrl]);
+})
 
   return (
     <div className="max-w-4xl mx-auto p-6 flex flex-col items-center gap-8">

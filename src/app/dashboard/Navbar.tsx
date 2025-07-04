@@ -1,10 +1,9 @@
 "use client";
 
-import Image from "next/image";
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, Home, UserCircle } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { redirect } from "next/navigation";
-import { logout } from "../../action/auth";
+import { getUserFromSession, logout } from "../../action/auth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,21 +20,23 @@ export default function Navbar() {
   useEffect(() => {
     const getUser = async () => {
       startTransition(async () => {
-        const res = await fetch("/api/user");
-        if (!res.ok) {
-          redirect("/signin");
-          return;
+        const res = await getUserFromSession();
+        
+        if (!res.data) {
+        redirect('/signin')
         }
-        const data = await res.json();
+        const {data} =  res;
         setUser({ name: data.name, email: data.email });
       });
     };
     getUser();
-  }, []);
+  },[]);
 
   const handleLogOut = () => {
     startTransition(async () => {
       await logout();
+        setUser(null)
+     
       redirect('/signin')
     });
   };
@@ -45,18 +46,13 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo on the left */}
-          <div className="flex-shrink-0 flex items-center">
-            <Image
-              width={18}
-              height={18}
-              className="h-8 w-auto"
-              src="/logo.png"
-              alt="Logo"
-            />
+          <div className="aspect-square items-center rounded-full border-2 border-red-500 h-[65%] flex justify-center bg-gray-100 hover:bg-red-400 cursor-pointer hover:text-white" onClick={()=> redirect("/dashboard")}>
+           <Home className=""/>
           </div>
 
           {/* User dropdown */}
-          <DropdownMenu>
+          
+ <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 className="p-1 rounded-full focus:outline-none bg-gray-200 border-red-400 border hover:bg-red-500 hover:text-white cursor-pointer "
@@ -77,6 +73,9 @@ export default function Navbar() {
                     <div className="text-sm text-gray-500 text-center">{user.email}</div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <UserCircle className="mr-2"/>My profile
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={handleLogOut}
                     disabled={isPending}
@@ -93,6 +92,8 @@ export default function Navbar() {
               )}
             </DropdownMenuContent>
           </DropdownMenu>
+         
+         
         </div>
       </div>
     </nav>

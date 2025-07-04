@@ -79,6 +79,20 @@ type ResumeInfo = {
 }
 
 
+export const deleteResume = async(id:string)=> {
+try {
+  
+  if(!id) return {error : true}
+  await connectDB()
+  await User.findByIdAndDelete({id : new Object(id)});
+  return {error : false}
+} catch (error) {
+  console.error(error)
+  return {error : true}
+}
+
+}
+
 export const getResumeFromUser = async(id : string) : Promise<ResumeInfo[]>=>{
 
   if(!id) return []
@@ -134,5 +148,16 @@ export async function getResume(id: string ){
    
     throw error 
   }
+}
+
+
+export async function  getadditionalInfo(rawData : string){
+      
+for(let i = 27 ;i < rawData.length ; i ++){
+   
+}
+
+
+
 }
 
