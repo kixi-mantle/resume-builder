@@ -37,7 +37,6 @@ return NextResponse.redirect(url.toString());
     const { data} = res
 
 
-    console.log(data);
     
 
     await connectDB()
@@ -59,7 +58,9 @@ if (!user) {
     await user.save()
 
 const sessiontoken = await createJWT(user._id.toString())
-        const response =  NextResponse.redirect('/dashboard')
+       const url = new URL('/dashboard', req.url);
+
+        const response =  NextResponse.redirect(url.toString())
         response.cookies.set('session', sessiontoken, {
         httpOnly: true,
         secure: false,
@@ -75,7 +76,7 @@ const sessiontoken = await createJWT(user._id.toString())
     
   } catch (error) {
     console.error('Error exchanging code for token:', error);
-    const url = new URL('/login?error=google_auth_failed', req.url);
+    const url = new URL('/signin?error=google_auth_failed', req.url);
 return NextResponse.redirect(url.toString());
   }
 }

@@ -50,17 +50,19 @@ export const updateResume = async ({
 }) => {
   try {
      await connectDB()
-     console.log(`\n${resumeId} this is it \n`);
      if (!Types.ObjectId.isValid(resumeId)) {
       return { error: true, msg: 'Invalid resume ID format' };
     }
-    const resume =  await Resume.findByIdAndUpdate(
+    
+      const resume = await Resume.findByIdAndUpdate(
       new Types.ObjectId(resumeId),
       { $set: updateData },
       { new: true, runValidators: true }
     ).lean();
+    console.log(updateData.experience)
+    console.log(resume?.experience)
 
-    console.log(resume)
+    
 
     return {error : false};
 
@@ -83,8 +85,15 @@ export const deleteResume = async(id:string)=> {
 try {
   
   if(!id) return {error : true}
+  console.log(id)
   await connectDB()
-  await User.findByIdAndDelete({id : new Object(id)});
+  const objectId = new Types.ObjectId(id)
+  await Resume.findByIdAndDelete(objectId);
+  await User.updateMany(
+    { resumeIds: objectId},
+    {$pull : {resumeIds : objectId}
+  }
+  )
   return {error : false}
 } catch (error) {
   console.error(error)
@@ -97,7 +106,7 @@ export const getResumeFromUser = async(id : string) : Promise<ResumeInfo[]>=>{
 
   if(!id) return []
   await connectDB()
-    const user  = await User.findById(new ObjectId(id)).select('resumeIds').populate<{resumeIds : {_id : ObjectId , title : string , createdAt: Date}[]}>({
+    const user  = await User.findById(new Types.ObjectId(id)).select('resumeIds').populate<{resumeIds : {_id : ObjectId , title : string , createdAt: Date}[]}>({
       path : "resumeIds",
       select : 'title createdAt',
       options : {sort : {createdAt : -1}}
@@ -119,7 +128,7 @@ export async  function toClientResume(doc: {
   };
 }
 
-export async function getResume(id: string ){
+export async function getResume(id: string ) : Promise<Template_1_type | null>{
     
   try {
     await connectDB();
@@ -150,14 +159,4 @@ export async function getResume(id: string ){
   }
 }
 
-
-export async function  getadditionalInfo(rawData : string){
-      
-for(let i = 27 ;i < rawData.length ; i ++){
-   
-}
-
-
-
-}
 

@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react";
-import Template_body from "../../../../../ResumeTemplate/resumes/Template-1_body";
 import { Template_1_type } from "../../../../../ResumeTemplate/resumeSchema";
 
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal, Download, AlertCircle } from "lucide-react";
+import Template_1 from "../../../../../ResumeTemplate/resumes/Template-1";
 
 export default function Preview({ resumeId, data }: { resumeId: string, data: Template_1_type }) {
   const pdfRef = useRef<HTMLDivElement | null>(null);
@@ -16,8 +16,12 @@ export default function Preview({ resumeId, data }: { resumeId: string, data: Te
   const [created, setCreated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
-
+  const [width , setWidth] = useState(794);
+  
+  
   useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal
   const generatePdf = async () => {
     try {
       if (!data) return;
@@ -35,6 +39,7 @@ export default function Preview({ resumeId, data }: { resumeId: string, data: Te
 
       // Send request to your API endpoint
       const response = await fetch('/api/resume/create-pdf', {
+        signal ,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -74,13 +79,25 @@ export default function Preview({ resumeId, data }: { resumeId: string, data: Te
   generatePdf();
 
   
+},[data , resumeId]);
+
+useEffect(()=>{
+  const updateDimensions = ()=>{
+    
+    setWidth(pdfRef.current?.clientWidth ?? 794)
+    
+  }
   
-}, [resumeId, data ]);
+  updateDimensions();
+  window.addEventListener("resize" , updateDimensions);
+  return () => window.removeEventListener('resize',updateDimensions)
+},[])
 
 useEffect(()=>{
 
   //cleanup function
 return () => {
+     
     if (pdfUrl) {
       URL.revokeObjectURL(pdfUrl); // Free memory when component unmounts
     }
@@ -88,7 +105,7 @@ return () => {
 })
 
   return (
-    <div className="max-w-4xl mx-auto p-6 flex flex-col items-center gap-8">
+    <div className="max-w-4xl mx-auto p-6 flex flex-col items-center gap-8 ">
       <Card className="w-full p-6 flex flex-col items-center gap-6">
 
          {isLoading ? (
@@ -117,11 +134,11 @@ return () => {
                   if (pdfUrl) {
                     const link = document.createElement("a");
                     link.href = pdfUrl;
-                    link.download = `${data.name || 'my'}-resume.pdf`;
+                    link.download = `resume.pdf`;
                     link.click();
                   }
                 }}
-                className="bg-red-600 hover:bg-red-700 gap-2"
+                className="bg-blue-500 hover:bg-red-700 gap-2"
               >
                 <Download className="h-4 w-4" />
                 Download PDF
@@ -140,11 +157,12 @@ return () => {
           </Alert>
         )}
         <div 
-          className="border rounded-md shadow-sm overflow-hidden"
-          style={{ width: '794px', height: '1123px' }} 
+          className="relative left-4 overflow-hidden w-full"
+          
           ref={pdfRef}
         >
-          <Template_body data={data} />
+         <Template_1 data={data} width={width}/>
+
         </div>
 
        

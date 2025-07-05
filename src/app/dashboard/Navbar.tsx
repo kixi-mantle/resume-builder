@@ -46,7 +46,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo on the left */}
-          <div className="aspect-square items-center rounded-full border-2 border-red-500 h-[65%] flex justify-center bg-gray-100 hover:bg-red-400 cursor-pointer hover:text-white" onClick={()=> redirect("/dashboard")}>
+          <div className="aspect-square items-center rounded-full border-2 border-blue-500 h-[65%] flex justify-center bg-gray-100 hover:bg-blue-500 cursor-pointer hover:text-white" onClick={()=> redirect("/dashboard")}>
            <Home className=""/>
           </div>
 
@@ -55,7 +55,7 @@ export default function Navbar() {
  <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="p-1 rounded-full focus:outline-none bg-gray-200 border-red-400 border hover:bg-red-500 hover:text-white cursor-pointer "
+                className="p-1 rounded-full focus:outline-none border-2 bg-gray-200 border-blue-400  hover:bg-blue-500 hover:text-white cursor-pointer "
                 disabled={isPending}
               >
                 <User className="h-8 w-8 " />

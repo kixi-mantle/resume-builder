@@ -7,7 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "../../../comp
 import { Input } from "../../../components/ui/input";
 import { login } from "../../../action/auth";
 import { toast } from "sonner";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import {zodResolver} from '@hookform/resolvers/zod'
 import { redirect } from "next/navigation";
@@ -53,6 +53,14 @@ const Page = () => {
 
 
   }
+
+  useEffect(()=>{
+    if(link){
+      setTimeout(() => {
+        setLink(false)
+      }, 5000);
+    }
+  },[link])
 
 
   
@@ -112,7 +120,9 @@ const Page = () => {
 
         <span className="block w-full text-center my-3 text-accent font-semibold">or</span>
         <div className="w-full flex justify-center">
-             <button className="rounded-full px-3 py-2 border-2 border-amber-600 text-sm font-semibold cursor-pointer hover:scale-[1.03] transition-all hover:accent-bg "> Login in with Google</button>
+             <button className="rounded-full px-3 py-2 border-2 border-amber-600 text-sm font-semibold cursor-pointer hover:scale-[1.03] transition-all hover:accent-bg"onClick={async()=>{
+               window.location.href = '/api/auth/google';
+             }}> Login in with Google</button>
         </div>
         
         {

@@ -42,7 +42,7 @@ const {register , watch , control , handleSubmit , setValue , reset } = useForm<
 
 useEffect(()=>{
     const getResumeData = async()=>{
-      console.log(`\n${resumeId} this is it \n`);
+      
     const resume = await getResume(resumeId)
     
     if (!resume) {
@@ -73,7 +73,7 @@ if (!resumeId) return notFound()
 const form : Template_1_type = watch();
 
 return (
- <div className="h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] px-[2rem] py-[4rem] relative flex justify-between items-center bg-gray-50">
+ <div className="h-[calc(100vh-4rem)] bg-gradient-to-br from-blue-50 to-indigo-50 max-h-[calc(100vh-4rem)] px-[2rem] py-[4rem] relative flex justify-between items-center bg-gray-50">
   {/* form part */}
   <div className='w-full lg:basis-[48%] h-full flex items-center'>
     <FormWrapper 

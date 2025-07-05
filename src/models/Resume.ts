@@ -46,8 +46,7 @@ const ResumeSchema : Schema<IResume> = new Schema({
     position: { type: String,  },
     company: { type: String,  },
     date: { type: String,  },
-    achivements: { type: String,  },
-    // You can add more fields as needed
+    achievements: { type: String, required : true },
   }],
   
   // Education Array (defined inline)
