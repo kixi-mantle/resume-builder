@@ -9,7 +9,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { useEffect, useState, useTransition } from "react"
+import {  useState, useTransition } from "react"
 import WorkExperience, { ResumeExperienceProps } from "./ResumeExperience"
 import Education, { ResumeEducationProps } from "./ResumeEducation"
 import { updateResume } from "../../../../action/resumeAction"
@@ -19,11 +19,7 @@ import { redirect } from "next/navigation"
 import { Check, ChevronLeft, ChevronRight, Loader2, Save } from "lucide-react"
 
 
-type ComponentKey<T> = {
-  component: React.ElementType;
-  data: T;
-  name : string
-};
+
 
 
 
@@ -41,10 +37,21 @@ type FormWrapperProps = {
 const FormWrapper  =({form , register , control , handleSubmit , setValue , resumeId} : FormWrapperProps) => {
 
 
+  interface ComponentEntry<T , G>{
+    component : React.ComponentType<G>;
+    data: T;
+    name : string;
+  }
   
-  
+  type ComponentMap = {
+  '1' : ComponentEntry<PersonalInfoProps['data'] , PersonalInfoProps>;
+  '2' : ComponentEntry<SummaryProps['data'] , SummaryProps>;
+  '3' : ComponentEntry<ResumeExperienceProps['data'] , ResumeExperienceProps> ;
+  '4' : ComponentEntry<ResumeEducationProps['data'] , ResumeEducationProps>;
+  '5' : ComponentEntry<InfoProps['data'] , InfoProps>;
+  }
 
-   const components : Record<string, ComponentKey<any>> = {
+   const components : ComponentMap = {
     '1' : {
         component : PersonalInfo , 
          data: {

@@ -32,7 +32,6 @@ const defaultValues  = {
   education: [],
   additionalInfo: '',
 }
-const [title , setTitle] = useState<string>('') 
 const unwrappedParams =  use(params)
 const {resumeId} = unwrappedParams
 const {register , watch , control , handleSubmit , setValue , reset } = useForm<Template_1_type>({
@@ -49,8 +48,7 @@ useEffect(()=>{
     router.push('/not-found');
     return;
   }
-      const {title , ...data} = resume
-    setTitle(title)
+      const {...data} = resume
       reset(data)
   }
   getResumeData()

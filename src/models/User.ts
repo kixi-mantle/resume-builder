@@ -3,7 +3,7 @@ import { comparePassword, passwordHash } from "../server/crypto";
 
 
 
-const auth = ["email" , "google" ] as const
+export const auth = ["email" , "google" ] as const
 type authEnum   = typeof auth[number] 
 
 export interface IUser extends Document {

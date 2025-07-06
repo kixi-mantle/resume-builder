@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Navbar from "./Navbar";
-import Image from "next/image";
 
 const Page = () => {
   const [resumePosition, setResumePosition] = useState(0);
