@@ -3,10 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Navbar from "./Navbar";
+import Image from "next/image";
 
 const Page = () => {
   const [resumePosition, setResumePosition] = useState(0);
-  const [activeStep, setActiveStep] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
@@ -16,13 +16,11 @@ const Page = () => {
     }, 100);
     
     // Auto-rotate steps
-    const stepInterval = setInterval(() => {
-      setActiveStep((prev) => (prev === 2 ? 0 : prev + 1));
-    }, 3000);
+   
 
     return () => {
       clearInterval(floatInterval);
-      clearInterval(stepInterval);
+     
     };
   }, []);
 
@@ -66,7 +64,7 @@ const Page = () => {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-6 leading-tight">
             Build <span className="text-blue-600">professional-grade</span> resumes in minutes
           </h1>
-          <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto font-semibold">
             Create, customize, and download your perfect resume - completely free. Stand out to employers with our elegant templates.
           </p>
           <button
@@ -87,67 +85,7 @@ const Page = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-16">
-            Build your resume in <span className="text-blue-600">three easy steps</span>
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            {/* Step 1 */}
-            <div 
-              className={`p-8 rounded-xl transition-all duration-500 ${activeStep === 0 ? 'bg-blue-50 border-2 border-blue-200 shadow-lg' : 'bg-gray-50 border border-gray-100'}`}
-              onMouseEnter={() => setActiveStep(0)}
-            >
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-6 ${activeStep === 0 ? 'bg-blue-100 text-blue-600' : 'bg-gray-200 text-gray-600'} text-2xl font-bold`}>
-                1
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-3">Initiate Your Resume</h3>
-              <p className="text-gray-600">
-                Select from our collection of professionally designed templates tailored for every industry.
-              </p>
-              <div className="mt-6 h-40 bg-gray-100 rounded-lg flex items-center justify-center">
-                <span className="text-gray-400">Template Selection UI</span>
-              </div>
-            </div>
-
-            {/* Step 2 */}
-            <div 
-              className={`p-8 rounded-xl transition-all duration-500 ${activeStep === 1 ? 'bg-blue-50 border-2 border-blue-200 shadow-lg' : 'bg-gray-50 border border-gray-100'}`}
-              onMouseEnter={() => setActiveStep(1)}
-            >
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-6 ${activeStep === 1 ? 'bg-blue-100 text-blue-600' : 'bg-gray-200 text-gray-600'} text-2xl font-bold`}>
-                2
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-3">Fill Your Data</h3>
-              <p className="text-gray-600">
-                Our intuitive form guides you through entering all your professional details with ease.
-              </p>
-              <div className="mt-6 h-40 bg-gray-100 rounded-lg flex items-center justify-center">
-                <span className="text-gray-400">Data Entry Form</span>
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div 
-              className={`p-8 rounded-xl transition-all duration-500 ${activeStep === 2 ? 'bg-blue-50 border-2 border-blue-200 shadow-lg' : 'bg-gray-50 border border-gray-100'}`}
-              onMouseEnter={() => setActiveStep(2)}
-            >
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-6 ${activeStep === 2 ? 'bg-blue-100 text-blue-600' : 'bg-gray-200 text-gray-600'} text-2xl font-bold`}>
-                3
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-3">Download & Share</h3>
-              <p className="text-gray-600">
-                Instantly download your polished resume in PDF format, ready to impress employers.
-              </p>
-              <div className="mt-6 h-40 bg-gray-100 rounded-lg flex items-center justify-center">
-                <span className="text-gray-400">Download Options</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
+     
       {/* CTA Section */}
       
     </div>

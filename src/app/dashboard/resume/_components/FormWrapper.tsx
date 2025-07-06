@@ -9,7 +9,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { useState, useTransition } from "react"
+import { useEffect, useState, useTransition } from "react"
 import WorkExperience, { ResumeExperienceProps } from "./ResumeExperience"
 import Education, { ResumeEducationProps } from "./ResumeEducation"
 import { updateResume } from "../../../../action/resumeAction"
@@ -109,7 +109,6 @@ const FormWrapper  =({form , register , control , handleSubmit , setValue , resu
   };
 
   const handleSave = async (data: Template_1_type) => {
-    console.log("igotcalled");
     
   startTransition(async () => {
     try {
@@ -139,7 +138,6 @@ const FormWrapper  =({form , register , control , handleSubmit , setValue , resu
       }
 
       // Now update with the final URL (either original Cloudinary or new upload)
-      console.log(data)
       const res = await updateResume({
         resumeId,
         updateData: { ...data, photo: finalPhotoUrl }
@@ -163,6 +161,8 @@ const FormWrapper  =({form , register , control , handleSubmit , setValue , resu
    
   }
 };
+
+
 
  
 

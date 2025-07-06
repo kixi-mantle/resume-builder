@@ -123,31 +123,35 @@ const PersonalInfo = ({ data, register, setValue }: PersonalInfoProps) => {
         <Button
           variant="outline"
           type="button"
-          className="flex gap-2 items-center"
+          className="flex gap-2 items-center hover:text-white"
           onClick={()=>{
             inputRef.current?.click()
           }}
         >
-          <Upload className="w-4 h-4" />
+          <Upload className="w-4 h-4 hover:text-white" />
           Upload Photo
         </Button>
       </label>
 
-      {isPending && (
-        <div className="w-[80px] h-[80px] flex items-center justify-center border-2 border-accent rounded-lg">
-          <div className="border-4 w-8 h-8 rounded-full border-t-transparent animate-spin border-red-400"></div>
+        <div className="w-[120px] h-[140px] flex items-center justify-center border-2 border-gray-100b bg-gray-50 rounded-lg">
+       {data.photo ? (
+        <div className="group">
+          <div className="w-12 h-12 bg-gray-100 hidden group-hover:visible hover:bg-red-400"></div>
+           
+          <Image
+            fill
+            src={data.photo}
+            alt="Uploaded"
+            className="rounded-md object-cover border"
+          />
         </div>
-      )}
+      ) : isPending && (
+          <div className="border-4 w-8 h-8 rounded-full border-t-transparent animate-spin border-red-400"></div>
+        )}
+        </div>
 
-      {data.photo && (
-        <Image
-          width={120}
-          height={140}
-          src={data.photo}
-          alt="Uploaded"
-          className="rounded-md object-cover border"
-        />
-      )}
+     
+     
     </div>
   </div>
 </div>

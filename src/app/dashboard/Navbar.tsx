@@ -73,7 +73,7 @@ export default function Navbar() {
                     <div className="text-sm text-gray-500 text-center">{user.email}</div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                  <DropdownMenuItem className="focus:bg-gray-100">
                     <UserCircle className="mr-2"/>My profile
                   </DropdownMenuItem>
                   <DropdownMenuItem
