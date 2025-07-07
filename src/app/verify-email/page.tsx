@@ -6,8 +6,8 @@ export default async function VerifyEmailPage({
   searchParams,
 }: {
   searchParams: {
-    token: string;
-    id: string;
+    token?: string;
+    id?: string;
   };
 }) {
   const { token, id } =   searchParams;
