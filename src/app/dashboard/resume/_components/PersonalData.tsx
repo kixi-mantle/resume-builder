@@ -136,7 +136,7 @@ const PersonalInfo = ({ data, register, setValue }: PersonalInfoProps) => {
         <div className="w-[120px] h-[140px] flex items-center justify-center border-2 border-gray-100b bg-gray-50 rounded-lg">
        {data.photo ? (
         <div className="group">
-          <div className="w-12 h-12 bg-gray-100 hidden group-hover:visible hover:bg-red-400"></div>
+          <div className="w-12 h-12 bg-gray-100 hidden group-hover:visible hover:bg-red-400 relative"></div>
            
           <Image
             fill
