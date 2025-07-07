@@ -51,7 +51,7 @@ export default function Navbar() {
   <defs>
     <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stopColor="#4F46E5"/>
-      <stop offset="100%" stop-color="#4338CA"/>
+      <stop offset="100%" stopColor="#4338CA"/>
     </linearGradient>
   </defs>
 </svg>

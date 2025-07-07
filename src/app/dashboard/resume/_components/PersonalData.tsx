@@ -133,13 +133,14 @@ const PersonalInfo = ({ data, register, setValue }: PersonalInfoProps) => {
         </Button>
       </label>
 
-        <div className="w-[120px] h-[140px] flex items-center justify-center border-2 border-gray-100b bg-gray-50 rounded-lg">
+        <div className="w-[120px] h-[140px] flex items-center justify-center border-2 border-gray-100 bg-gray-50 rounded-lg relative">
        {data.photo ? (
         <div className="group">
-          <div className="w-12 h-12 bg-gray-100 hidden group-hover:visible hover:bg-red-400 relative"></div>
+          <div className="w-full h-full bg-gray-100 hidden group-hover:block hover:bg-red-400 relative"></div>
            
           <Image
-            fill
+            width={120}
+            height={140}
             src={data.photo}
             alt="Uploaded"
             className="rounded-md object-cover border"
