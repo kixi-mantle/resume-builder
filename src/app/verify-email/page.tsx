@@ -5,12 +5,9 @@ import { redirect } from "next/navigation";
 export default async function VerifyEmailPage({
   searchParams,
 }: {
-  searchParams: {
-    token?: string;
-    id?: string;
-  };
+  searchParams: Promise<{token?: string , id?: string}>
 }) {
-  const { token, id } =   searchParams;
+  const { token, id } =  await searchParams;
 
   // Handle missing parameters
   if (!token || !id) {
