@@ -34,7 +34,7 @@ export const sendVerificationEmail = async (email : string , token : string , id
     }
 } as TransportOptions)
           
-    const verificationUrl =  `http://localhost:3000/verify-email?token=${token}&id=${id}`
+    const verificationUrl =  `https://resume-builder-silk-kappa.vercel.app/verify-email?token=${token}&id=${id}`
 
     const mailOptions = {
         from : env.EMAIL_USERNAME,
