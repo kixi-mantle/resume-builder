@@ -10,7 +10,7 @@ export default async function VerifyEmailPage({
     id: string;
   };
 }) {
-  const { token, id } =  await searchParams;
+  const { token, id } =   searchParams;
 
   // Handle missing parameters
   if (!token || !id) {
@@ -43,10 +43,8 @@ export default async function VerifyEmailPage({
   },
     });
 
-    console.log('i also ran')
     
     const data = await res.json();
-    console.log(data.message)
 
     
 
