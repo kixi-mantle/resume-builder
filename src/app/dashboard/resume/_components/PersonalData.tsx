@@ -1,7 +1,7 @@
 import { UseFormRegister, UseFormSetValue } from "react-hook-form";
 import { Template_1_type } from "../../../../ResumeTemplate/resumeSchema";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Upload, X } from "lucide-react";
 import Image from "next/image";
 import { useRef, useTransition } from "react";
 
@@ -136,7 +136,7 @@ const PersonalInfo = ({ data, register, setValue }: PersonalInfoProps) => {
         <div className="w-[120px] h-[140px] flex items-center justify-center border-2 border-gray-100 bg-gray-50 rounded-lg relative">
        {data.photo ? (
         <div className="group">
-          <div className="w-full h-full bg-gray-100 hidden group-hover:block hover:bg-red-400 relative"></div>
+          <div className="w-12 h-12 rounded-full bg-gray-100 hidden group-hover:block hover:bg-red-400"><X/></div>
            
           <Image
             width={120}

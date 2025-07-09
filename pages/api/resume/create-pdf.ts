@@ -1,17 +1,26 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+import chromium from 'chrome-aws-lambda'
 import { renderToString } from 'react-dom/server'
 import React from 'react'
-import puppeteer from 'puppeteer'
+import puppeteer from 'puppeteer-core'
 import { getResume } from '../../../src/action/resumeAction'
 import Template_body from '../../../src/ResumeTemplate/resumes/Template-1_body'
+import Chromium from 'chrome-aws-lambda'
 
 // PDF Generation Utility
 const generatePDF = async (html: string) => {
+
+  const path = await Chromium.executablePath
+  console.log(path)
+  
   const browser = await puppeteer.launch({
     headless: true, // Use new Headless mode
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    devtools: false
+    args: ['--no-sandbox' , '--disable-setuid-sandbox'],
+    devtools: false,
+    executablePath : await getLocalChromePath()
+
   });
+
 
   try {
     const page = await browser.newPage();
@@ -22,6 +31,7 @@ const generatePDF = async (html: string) => {
       height: 1754,
       deviceScaleFactor: 2
     });
+
 
     // Enable request interception
     await page.setRequestInterception(true);
@@ -56,27 +66,53 @@ const generatePDF = async (html: string) => {
 
    
     await page.evaluate(async()=>{
-      const images = Array.from(document.querySelectorAll('img'))
-      await Promise.all(
-    images.map((img) => {
-      if (img.complete && img.naturalWidth !== 0) {
-        // Image already loaded
-        return Promise.resolve();
-      } else {
-        // Return a promise that resolves when the image loads or rejects on error
-        return new Promise((resolve, reject) => {
-          img.addEventListener('load', resolve);
-          img.addEventListener('error', reject);
-        });
+      const images : HTMLImageElement[] = Array.from(document.querySelectorAll('img'));
+      for(const img of images) {
+
+       await new Promise<void>((resolve)=>{
+         const timeoutId =  setTimeout(()=>{
+            cleanup()
+            resolve()
+          },3000)
+
+           const cleanup = () => {
+          clearTimeout(timeoutId);
+          img.removeEventListener('load', onLoad);
+          img.removeEventListener('error', onError);
+        };
+
+        const onLoad = () => {
+          cleanup();
+          resolve();
+        };
+
+        const onError = () => {
+          cleanup();
+          resolve(); // treat error as "done"
+        };
+
+        img.addEventListener('load', onLoad, { once: true });
+        img.addEventListener('error', onError, { once: true });
+
+        })
+
+       
       }
+
+        
+ 
+      
+
+     
+      
     })
-  );
-    })
+
+  
 
 
     // Generate PDF
     const buffer = await page.pdf({
-      format: 'A4',
+      format: 'a4',
       printBackground: true,
       margin: { top: '0mm', right: '0mm', bottom: '0mm', left: '0mm' },
       preferCSSPageSize: true,
@@ -85,9 +121,14 @@ const generatePDF = async (html: string) => {
 
     return buffer;
   } finally {
-   
+   browser.close()
   }
 };
+
+  async function getLocalChromePath() {
+   const lambdaPath = await chromium.executablePath;
+  return lambdaPath || 'C:/Users/Sujan Khadka/AppData/Local/Google/Chrome/Application/chrome.exe';
+}
 // Error Handler
 const handleError = async (res: NextApiResponse, status: number, message: string): Promise<void> => {
   const errorHtml = `
@@ -181,7 +222,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       'Expires': '0'
     })
 
-    return res.end(pdfBuffer)
+     res.status(200).end(pdfBuffer)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     console.error('PDF Generation Error:', error)
