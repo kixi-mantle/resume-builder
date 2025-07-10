@@ -1,10 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { renderToString } from 'react-dom/server'
 import React from 'react'
-import puppeteer from 'puppeteer-core'
 import { getResume } from '../../../src/action/resumeAction'
 import Template_body from '../../../src/ResumeTemplate/resumes/Template-1_body'
-import chromium from 'chrome-aws-lambda'
+import puppeteer from 'puppeteer'
 
 // PDF Generation Utility
 const generatePDF = async (html: string) => {
@@ -14,9 +13,6 @@ const generatePDF = async (html: string) => {
   const browser = await puppeteer.launch({
     headless: true, // Use new Headless mode
     args: ['--no-sandbox' , '--disable-setuid-sandbox'],
-    devtools: false,
-    executablePath : await getLocalChromePath()
-
   });
 
 
@@ -123,16 +119,7 @@ const generatePDF = async (html: string) => {
   }
 };
 
-  async function getLocalChromePath() {
-   const path = await chromium.executablePath;
- if (process.env.AWS_EXECUTION_ENV) {
-    if (!path) throw new Error('🚨 chrome-aws-lambda executablePath is null on Vercel!');
-    return path;
-  }
-
-  return path || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
-}
-// Error Handler
+  
 const handleError = async (res: NextApiResponse, status: number, message: string): Promise<void> => {
   const errorHtml = `
     <!DOCTYPE html>
