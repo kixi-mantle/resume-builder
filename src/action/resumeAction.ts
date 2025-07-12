@@ -5,9 +5,10 @@ import { revalidateTag } from "next/cache";
 import { Template_1_type } from "../ResumeTemplate/resumeSchema";
 import { connectDB } from "../lib/mongodb";
 import Resume from "../models/Resume";
-import User from "../models/User";
+import User, { IUser } from "../models/User";
 import { ObjectId } from "mongodb";
 import { Types } from "mongoose";
+import cloudinary from "../server/cloudinary";
 
 export const createResume = async ({
   ownerId,
@@ -88,7 +89,13 @@ try {
   console.log(id)
   await connectDB()
   const objectId = new Types.ObjectId(id)
+  const url = await User.findById<IUser>(objectId).select("photo -_id").lean()
   await Resume.findByIdAndDelete(objectId);
+  if (url?.photo) {
+    const publicId = getPublicIdFromUrl(url.photo)
+
+   if (publicId) await cloudinary.uploader.destroy(publicId)
+}
   await User.updateMany(
     { resumeIds: objectId},
     {$pull : {resumeIds : objectId}
@@ -100,6 +107,14 @@ try {
   return {error : true}
 }
 
+}
+
+function getPublicIdFromUrl(url : string) {
+  const parts = url.split('/');
+  const last = parts.pop(); // "my_image.jpg"
+  if (!last) return null
+  const publicId = parts.slice(7).join('/') + '/' + last.split('.')[0]; 
+  return publicId; // e.g., "my_folder/my_image"
 }
 
 export const getResumeFromUser = async(id : string) : Promise<ResumeInfo[]>=>{

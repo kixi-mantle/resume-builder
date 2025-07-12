@@ -2,7 +2,7 @@ import mongoose, { Document, Model, Schema, Types } from "mongoose";
 import { comparePassword, passwordHash } from "../server/crypto";
 
 
-
+ 
 export const auth = ["email" , "google" ] as const
 type authEnum   = typeof auth[number] 
 
@@ -14,6 +14,7 @@ export interface IUser extends Document {
   passwordHash?: string;
   googleId? : string,
   resumeIds : [Types.ObjectId]
+  photo : string | null
 
   authType : authEnum
   createdAt: Date;
